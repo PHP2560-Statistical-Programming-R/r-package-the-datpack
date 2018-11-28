@@ -1,6 +1,10 @@
 Packages to use: 	epiR, incidence, epitools, epicalc, Epi
  
 ```{r}
+#install.packages("epicalc", repos = "http://medipe.psu.ac.th/epicalc")
+
+
+
 library(epiR)
 library(epitools)
 library(incidence)
@@ -26,6 +30,10 @@ To include:
   mcnemar's test
 
 
+
+1.
+2.
+3.
 use wcgs to test
   
 
