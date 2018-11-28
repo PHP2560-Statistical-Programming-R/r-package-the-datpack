@@ -1,0 +1,4 @@
+Packages to use: 	epiR, incidence, epitools, epicalc, Epi
+ 
+  
+  
