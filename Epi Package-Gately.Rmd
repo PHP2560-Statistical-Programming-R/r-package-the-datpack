@@ -10,6 +10,18 @@ knitr::opts_chunk$set(echo = TRUE)
 Link to shiny with leaflet example:
 https://rstudio.github.io/leaflet/shiny.html 
 
+Link to mapping examples: 
+https://cran.r-project.org/web/packages/usmap/vignettes/mapping.html
+
+Link to names of Fatalities Variables:
+https://github.com/cran/AER/blob/master/man/Fatalities.Rd 
+
+Ideas:
+1.) Create a function to map incidence on state level
+2.) Create a function to map incidence on based on region
+3.) Create a function to map incidence nationally
+
+
 ```{r}
 library(MASS)
 library(epiR)
@@ -22,27 +34,59 @@ library(roxygen2)
 library(epicalc)
 library(leaflet)
 library(maps)
+library(usmap)
+library(ggplot2)
+```
+
+#Load sample dataset available in the AER package
+```{r}
+library(AER)
+data(Fatalities)
+```
+
+
+#Example code for national fatalities
+```{r}
+plot_usmap(data = Fatalities, values = "fatal", lines = "red") + 
+  scale_fill_continuous(name = "Fatalities", label = scales::comma) + 
+  theme(legend.position = "right")
 ```
 
 ```{r}
-m <- leaflet() %>%
-  addTiles() %>%  # Add default OpenStreetMap map tiles
-  addMarkers(lng=174.768, lat=-36.852, popup="The birthplace of R")
-m
-
-mapStates <- map("state", fill = TRUE, plot = FALSE)
-leaflet(data = mapStates) %>% addTiles() %>%
-  addPolygons(fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-
+plot_usmap(
+    data = Fatalities, values = "fatal", include =c("ma","ri","ct","me","vt","nh","ny","nj","pa"), lines = "red"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "red", name = "fatalities", label = scales::comma
+  ) + 
+  labs(title = "Northeast US States") + theme(legend.position = "right")
 ```
-
 
 To do: 
 Write function for mapping (state, city, and zip)
 within the function, have it first calculate incidence/prevalence, etc. from a predefined previous function
 
+#Function to Write
 ```{r}
-map_incidence
+map_incidence<- function(m,s,t) {
+  m <- fatal / pop  # insert incidence function here
+  if (state == "al") {
+    
+  }
+  t<-
+    #then add mapping
+}
+
+#state variable (map)
+#fatal variable (incidence) fatal/pop
+#year variable (time)
+```
 
 
+
+
+Ideas:
+1.) Create a function to map incidence on state level
+2.) Create a function to map incidence on based on region
+3.) Create a function to map incidence nationally
 
