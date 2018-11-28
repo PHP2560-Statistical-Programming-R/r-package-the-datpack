@@ -3,7 +3,7 @@ Packages to use: 	epiR, incidence, epitools, epicalc, Epi
 ```{r}
 #install.packages("epicalc", repos = "http://medipe.psu.ac.th/epicalc")
 
-
+#http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/resources/R/packages.pdf
 
 library(epiR)
 library(epitools)
