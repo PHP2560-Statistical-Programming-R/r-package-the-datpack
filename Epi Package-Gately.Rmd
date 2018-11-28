@@ -25,16 +25,19 @@ library(maps)
 ```
 
 ```{r}
-m <- leaflet() %>%
-  addTiles() %>%  # Add default OpenStreetMap map tiles
-  addMarkers(lng=174.768, lat=-36.852, popup="The birthplace of R")
-m
-
-mapStates <- map("state", fill = TRUE, plot = FALSE)
-leaflet(data = mapStates) %>% addTiles() %>%
+mapStates <- map("al", fill = TRUE, plot = FALSE)
+leaflet(data = Fatalities) %>% addTiles() %>%
   addPolygons(fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
 
 ```
+
+```{r}
+neStates <- subset(Fatalities, Fatalities$state %in% c(
+  "ct","me","ma","nh","ri","vt","ny","nj","pa"
+))
+
+```
+
 
 
 To do: 
@@ -42,7 +45,39 @@ Write function for mapping (state, city, and zip)
 within the function, have it first calculate incidence/prevalence, etc. from a predefined previous function
 
 ```{r}
-map_incidence
+map_incidence<- function(m,s,t) {
+  m <- fatal / pop  # insert incidence function here
+  if (state == "al") {
+    
+  }
+  t<-
+    #then add mapping
+}
+
+#state variable (map)
+#fatal variable (incidence) fatal/pop
+#year variable (time)
+```
+
+```{r}
+(table.deaths<-with(Fatalities,tapply(fatal, list(state,
+year), sum)))
+(table.exp<-with(Fatalities,tapply(milestot, list(state,
+year), sum)))
+inc.dense<-table.deaths/table.exp*100
+inc.dense
+plot.ts(t(inc.dense), plot.type="single") #
+
+```
 
 
+Ideas:
+1.) Create a function to map incidence on state level
+2.) Create a function to map incidence on based on region
+3.) Create a function to map incidence nationally
 
+#Load sample dataset available in the AER package
+```{r}
+library(AER)
+data(Fatalities)
+```
