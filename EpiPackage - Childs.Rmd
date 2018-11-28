@@ -1,4 +1,11 @@
 Packages to use: 	epiR, incidence, epitools, epicalc, Epi
  
-  
+```{r}
+library(epiR)
+library(epitools)
+library(incidence)
+library(Epi)
+library(epiDisplay)
+library(epicalc)
+```
   
