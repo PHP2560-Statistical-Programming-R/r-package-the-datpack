@@ -5,6 +5,77 @@ Packages to use: 	epiR, incidence, epitools, epicalc, Epi
 
 #http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/resources/R/packages.pdf
 
+#summary tables and statistics - create & visualize
+```
+
+```{r}
+epi.box<-function(x,y, data, main, xlab, ylab, notch=TRUE ){
+  boxplot(x~y, data=data, notch=notch,
+  main="main", xlab="xlab", ylab="ylab")
+} 
+
+epi.box(Fatalities$income, Fatalities$jail, data=Fatalities)
+```
+
+```{r}
+epi.hist<-function(x,y, data, main, xlab, ylab, notch=TRUE ){
+  boxplot(x~y, data=data, notch=notch,
+  main="main", xlab="xlab", ylab="ylab")
+} 
+
+epi.box(Fatalities$income, Fatalities$jail, data=Fatalities)
+
+
+epi.dens<-
+```
+
+```{r}  
+ggplot(data=Fatalities, aes(Fatalities$income)) + 
+  geom_histogram(aes(y =..density..), 
+                 col="blue", 
+                 fill="grey", 
+                 alpha=.2) + 
+  geom_density(col=2) + 
+  labs(title="Histogram for Age", x="Age", y="Count")
+  
+  
+  #make a 2x2**********************
+blue
+```
+
+```{r}
+
+#epi.2by2
+
+dat <- matrix(c(13,2163,5,3349), nrow = 2, byrow = TRUE)
+rownames(dat) <- c("DF+", "DF-"); colnames(dat) <- c("FUS+", "FUS-"); dat
+
+epi.2by2(dat = as.table(dat), method = "cross.sectional", 
+   conf.level = 0.95, units = 100,  homogeneity = "breslow.day", 
+   outcome = "as.columns")
+
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(data=Fatalities, aes(Fatalities$miles)) + 
+  geom_histogram(col="red",
+                 aes(fill=..count..)) +
+  scale_fill_gradient("Count", low="yellow", high="green")
+
+```
+
+```{r}
+library(AER)
+
+data("Fatalities")
+
+
+
+
+if comments for when people don't read instructions
+
 library(epiR)
 library(epitools)
 library(incidence)
