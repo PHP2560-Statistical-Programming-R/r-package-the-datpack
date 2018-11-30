@@ -113,7 +113,8 @@ map_incidence <-
 Fatalities %>%
   (function(i) {
   #m <- fatal / pop  # insert incidence function here
-     if (state == "alabama") {
+  s<- state[[i]]
+     if (i == "alabama") {
  plot_usmap(
     data = Fatalities, values = "fatal", include ="AL", lines = "black"
   ) + 
