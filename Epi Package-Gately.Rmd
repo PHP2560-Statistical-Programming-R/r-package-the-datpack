@@ -36,6 +36,7 @@ library(leaflet)
 library(maps)
 library(usmap)
 library(ggplot2)
+library(dplyr)
 ```
 
 #Load sample dataset available in the AER package
@@ -58,7 +59,7 @@ plot_usmap(
     data = Fatalities, values = "fatal", include =c("MA","RI","CT","ME","VT","NH","NY","NJ","PA"), lines = "black"
   ) + 
   scale_fill_continuous(
-    low = "white", high = "blue", name = "fatalities", label = scales::comma
+    low = "white", high = "dark blue", name = "fatalities", label = scales::comma
   ) + 
   labs(title = "Northeast US States") + theme(legend.position = "right")
 ```
@@ -82,7 +83,7 @@ plot_usmap(
     data = Fatalities, values = "fatal", include =c("OH","MI","IN","WI","IL","MN","IA","MO","ND","SD","NE","KS"), lines = "black"
   ) + 
   scale_fill_continuous(
-    low = "white", high = "red", name = "fatalities", label = scales::comma
+    low = "white", high = "pink", name = "fatalities", label = scales::comma
   ) + 
   labs(title = "Midwest US States") + theme(legend.position = "right")
 ```
@@ -91,14 +92,16 @@ The Midwest consists of Ohio, Michigan, Indiana, Wisconsin, Illinois, Minnesota,
 #Map of West Coast
 ```{r}
 plot_usmap(
-    data = Fatalities, values = "fatal", include = c("MT","WY","CO","NM","AZ","UT","CA", "ID", "NV", "OR", "WA","AK","HI"), lines = "red"
+    data = Fatalities, values = "fatal", include = c("MT","WY","CO","NM","AZ","UT","CA", "ID", "NV", "OR", "WA"), lines = "black"
   ) + 
   scale_fill_continuous(
-    low = "white", high = "orange", name = "Fatalities", label = scales::comma
+    low = "white", high = "sky blue", name = "Fatalities", label = scales::comma
   ) + 
   labs(title = "Western US States") + theme(legend.position = "right")
 ```
 The West comprises Montana, Idaho, Wyoming, Colorado, New Mexico, Arizona, Utah, Nevada, California, Oregon, Washington, Alaska, and Hawaii.
+
+##NOTE: no data for Alaska or Hawaii
 
 To do: 
 Write function for mapping (state, city, and zip)
@@ -106,20 +109,37 @@ within the function, have it first calculate incidence/prevalence, etc. from a p
 
 #Function to Write
 ```{r}
-map_incidence<- function(m,s,t) {
-  m <- fatal / pop  # insert incidence function here
-  if (state == "al") {
-    
-  }
-  t<-
+map_incidence <- 
+Fatalities %>%
+  (function(i) {
+  #m <- fatal / pop  # insert incidence function here
+     if (state == "alabama") {
+ plot_usmap(
+    data = Fatalities, values = "fatal", include ="AL", lines = "black"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "dark blue", name = "fatalities", label = scales::comma
+  ) + 
+  labs(title = "Alabama") + theme(legend.position = "right")
+  #addPolygons(fillColor = "jail", stroke = FALSE)
+    }
+  #t<-
     #then add mapping
-}
+  }
+)
 
 #state variable (map)
 #fatal variable (incidence) fatal/pop
 #year variable (time)
 ```
 
-
-
+```{r}
+plot_usmap(
+    data = Fatalities, values = "fatal", include ="AL", lines = "black"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "dark blue", name = "fatalities", label = scales::comma
+  ) + 
+  labs(title = "Alabama") + theme(legend.position = "right")
+```
 
