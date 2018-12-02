@@ -115,13 +115,8 @@ Fatalities %>%
   #m <- fatal / pop  # insert incidence function here
   s<- state[[i]]
      if (i == "alabama") {
- plot_usmap(
-    data = Fatalities, values = "fatal", include ="AL", lines = "black"
-  ) + 
-  scale_fill_continuous(
-    low = "white", high = "dark blue", name = "fatalities", label = scales::comma
-  ) + 
-  labs(title = "Alabama") + theme(legend.position = "right")
+ plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
   #addPolygons(fillColor = "jail", stroke = FALSE)
     }
   #t<-
@@ -134,13 +129,21 @@ Fatalities %>%
 #year variable (time)
 ```
 
+#Incidence part of function
 ```{r}
-plot_usmap(
-    data = Fatalities, values = "fatal", include ="AL", lines = "black"
-  ) + 
-  scale_fill_continuous(
-    low = "white", high = "dark blue", name = "fatalities", label = scales::comma
-  ) + 
-  labs(title = "Alabama") + theme(legend.position = "right")
+#take from epi package (this will incorporate time)
 ```
+
+#Time component of the function
+```{r}
+#This may be incorporated elsewhere
+```
+
+#Map part of the function
+```{r}
+plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
+```
+
+
 
