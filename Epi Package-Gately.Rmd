@@ -55,48 +55,29 @@ plot_usmap(data = Fatalities, values = "fatal", lines = "red") +
 
 #Map of Northeast
 ```{r}
-plot_usmap(
-    data = Fatalities, values = "fatal", include =c("MA","RI","CT","ME","VT","NH","NY","NJ","PA"), lines = "black"
-  ) + 
-  scale_fill_continuous(
-    low = "white", high = "dark blue", name = "fatalities", label = scales::comma
-  ) + 
-  labs(title = "Northeast US States") + theme(legend.position = "right")
+plot_usmap(data = Fatalities, values = "fatal", include =c("MA","RI","CT","ME","VT","NH","NY","NJ","PA"), lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Northeast US States") + theme(legend.position = "right")
 ```
 The Northeast includes Maine, New Hampshire, Vermont, Massachusetts, Rhode Island, Connecticut, New York, New Jersey, and Pennsylvania
 
 #Map of South 
 ```{r}
-plot_usmap(
-    data = Fatalities, values = "fatal", include =c("DE","MD","WV","VA","KY","TN","NC","SC","GA","AL","MS","AR","LA","FL","TX","OK"), lines = "black"
-  ) + 
-  scale_fill_continuous(
-    low = "white", high = "dark green", name = "fatalities", label = scales::comma
-  ) + 
-  labs(title = "Southern US States") + theme(legend.position = "right")
+plot_usmap(data = Fatalities, values = "fatal", include =c("DE","MD","WV","VA","KY","TN","NC","SC","GA","AL","MS","AR","LA","FL","TX","OK"), lines = "black") + scale_fill_continuous(low = "white", high = "dark green", name = "fatalities", label = scales::comma) + labs(title = "Southern US States") + theme(legend.position = "right")
 ```
 The South claims more states than any other region: Delaware, Maryland, Virginia, West Virginia, Kentucky, North Carolina, South Carolina, Tennessee, Georgia, Florida, Alabama, Mississippi, Arkansas, Louisiana, Texas, and Oklahoma.
 
 #Map of Midwest
 ```{r}
-plot_usmap(
-    data = Fatalities, values = "fatal", include =c("OH","MI","IN","WI","IL","MN","IA","MO","ND","SD","NE","KS"), lines = "black"
-  ) + 
-  scale_fill_continuous(
-    low = "white", high = "pink", name = "fatalities", label = scales::comma
-  ) + 
-  labs(title = "Midwest US States") + theme(legend.position = "right")
+plot_usmap(data = Fatalities, values = "fatal", include =c("OH","MI","IN","WI","IL","MN","IA","MO","ND","SD","NE","KS"), lines = "black") + 
+  scale_fill_continuous(low = "white", high = "pink", name = "fatalities", label = scales::comma
+  ) + labs(title = "Midwest US States") + theme(legend.position = "right")
 ```
 The Midwest consists of Ohio, Michigan, Indiana, Wisconsin, Illinois, Minnesota, Iowa, Missouri, North Dakota, South Dakota, Nebraska, and Kansas.
 
 #Map of West Coast
 ```{r}
-plot_usmap(
-    data = Fatalities, values = "fatal", include = c("MT","WY","CO","NM","AZ","UT","CA", "ID", "NV", "OR", "WA"), lines = "black"
-  ) + 
-  scale_fill_continuous(
-    low = "white", high = "sky blue", name = "Fatalities", label = scales::comma
-  ) + 
+plot_usmap(data = Fatalities, values = "fatal", include = c("MT","WY","CO","NM","AZ","UT","CA", "ID", "NV", "OR", "WA"), lines = "black") + 
+  scale_fill_continuous(low = "white", high = "sky blue", name = "Fatalities", label = scales::comma) + 
   labs(title = "Western US States") + theme(legend.position = "right")
 ```
 The West comprises Montana, Idaho, Wyoming, Colorado, New Mexico, Arizona, Utah, Nevada, California, Oregon, Washington, Alaska, and Hawaii.
@@ -109,21 +90,19 @@ within the function, have it first calculate incidence/prevalence, etc. from a p
 
 #Function to Write
 ```{r}
-map_incidence <- 
-Fatalities %>%
-  (function(i) {
-  #m <- fatal / pop  # insert incidence function here
-  s<- state[[i]]
+map_prevalence <- function(d,a,b,s,t) {
+  d <- dataset   #imput dataset
+  prevalence <- a/b#a number of cases, b is pop
+  return(prevalence)
+   #t<- all years or one year
+  s <- state[[i]]
      if (i == "alabama") {
  plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
-  #addPolygons(fillColor = "jail", stroke = FALSE)
-    }
-  #t<-
-    #then add mapping
+     }
   }
-)
 
+map_prevalence(Fatalaties,fatal,pop,alabama)
 #state variable (map)
 #fatal variable (incidence) fatal/pop
 #year variable (time)
@@ -131,6 +110,7 @@ Fatalities %>%
 
 #Incidence part of function
 ```{r}
+prevalence <- a/b 
 #take from epi package (this will incorporate time)
 ```
 
