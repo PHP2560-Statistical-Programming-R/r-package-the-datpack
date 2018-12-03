@@ -10,6 +10,18 @@ knitr::opts_chunk$set(echo = TRUE)
 Link to shiny with leaflet example:
 https://rstudio.github.io/leaflet/shiny.html 
 
+Link to mapping examples: 
+https://cran.r-project.org/web/packages/usmap/vignettes/mapping.html
+
+Link to names of Fatalities Variables:
+https://github.com/cran/AER/blob/master/man/Fatalities.Rd 
+
+Ideas:
+1.) Create a function to map incidence on state level
+2.) Create a function to map incidence on based on region
+3.) Create a function to map incidence nationally
+
+
 ```{r}
 library(MASS)
 library(epiR)
@@ -22,27 +34,116 @@ library(roxygen2)
 library(epicalc)
 library(leaflet)
 library(maps)
+library(usmap)
+library(ggplot2)
+library(dplyr)
 ```
 
+#Load sample dataset available in the AER package
 ```{r}
-m <- leaflet() %>%
-  addTiles() %>%  # Add default OpenStreetMap map tiles
-  addMarkers(lng=174.768, lat=-36.852, popup="The birthplace of R")
-m
-
-mapStates <- map("state", fill = TRUE, plot = FALSE)
-leaflet(data = mapStates) %>% addTiles() %>%
-  addPolygons(fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-
+library(AER)
+data(Fatalities)
 ```
 
+
+#Example code for national fatalities
+```{r}
+plot_usmap(data = Fatalities, values = "fatal", lines = "red") + 
+  scale_fill_continuous(name = "Fatalities", label = scales::comma) + 
+  theme(legend.position = "right")
+```
+
+#Map of Northeast
+```{r}
+plot_usmap(
+    data = Fatalities, values = "fatal", include =c("MA","RI","CT","ME","VT","NH","NY","NJ","PA"), lines = "black"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "dark blue", name = "fatalities", label = scales::comma
+  ) + 
+  labs(title = "Northeast US States") + theme(legend.position = "right")
+```
+The Northeast includes Maine, New Hampshire, Vermont, Massachusetts, Rhode Island, Connecticut, New York, New Jersey, and Pennsylvania
+
+#Map of South 
+```{r}
+plot_usmap(
+    data = Fatalities, values = "fatal", include =c("DE","MD","WV","VA","KY","TN","NC","SC","GA","AL","MS","AR","LA","FL","TX","OK"), lines = "black"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "dark green", name = "fatalities", label = scales::comma
+  ) + 
+  labs(title = "Southern US States") + theme(legend.position = "right")
+```
+The South claims more states than any other region: Delaware, Maryland, Virginia, West Virginia, Kentucky, North Carolina, South Carolina, Tennessee, Georgia, Florida, Alabama, Mississippi, Arkansas, Louisiana, Texas, and Oklahoma.
+
+#Map of Midwest
+```{r}
+plot_usmap(
+    data = Fatalities, values = "fatal", include =c("OH","MI","IN","WI","IL","MN","IA","MO","ND","SD","NE","KS"), lines = "black"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "pink", name = "fatalities", label = scales::comma
+  ) + 
+  labs(title = "Midwest US States") + theme(legend.position = "right")
+```
+The Midwest consists of Ohio, Michigan, Indiana, Wisconsin, Illinois, Minnesota, Iowa, Missouri, North Dakota, South Dakota, Nebraska, and Kansas.
+
+#Map of West Coast
+```{r}
+plot_usmap(
+    data = Fatalities, values = "fatal", include = c("MT","WY","CO","NM","AZ","UT","CA", "ID", "NV", "OR", "WA"), lines = "black"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "sky blue", name = "Fatalities", label = scales::comma
+  ) + 
+  labs(title = "Western US States") + theme(legend.position = "right")
+```
+The West comprises Montana, Idaho, Wyoming, Colorado, New Mexico, Arizona, Utah, Nevada, California, Oregon, Washington, Alaska, and Hawaii.
+
+##NOTE: no data for Alaska or Hawaii
 
 To do: 
 Write function for mapping (state, city, and zip)
 within the function, have it first calculate incidence/prevalence, etc. from a predefined previous function
 
+#Function to Write
 ```{r}
-map_incidence
+map_incidence <- 
+Fatalities %>%
+  (function(i) {
+  #m <- fatal / pop  # insert incidence function here
+  s<- state[[i]]
+     if (i == "alabama") {
+ plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
+  #addPolygons(fillColor = "jail", stroke = FALSE)
+    }
+  #t<-
+    #then add mapping
+  }
+)
+
+#state variable (map)
+#fatal variable (incidence) fatal/pop
+#year variable (time)
+```
+
+#Incidence part of function
+```{r}
+#take from epi package (this will incorporate time)
+```
+
+#Time component of the function
+```{r}
+#This may be incorporated elsewhere
+```
+
+#Map part of the function
+```{r}
+plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
+```
 
 
 
