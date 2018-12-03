@@ -92,10 +92,10 @@ within the function, have it first calculate incidence/prevalence, etc. from a p
 ```{r}
 map_prevalence <- function(d,a,b,s,t) {
   d <- dataset   #imput dataset
-  prevalence <- a/b#a number of cases, b is pop
+  prevalence <- a/b #a number of cases, b is pop
   return(prevalence)
    #t<- all years or one year
-  s <- state[[i]]
+  s <- state[[i]] #group by state 
      if (i == "alabama") {
  plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
@@ -112,11 +112,16 @@ map_prevalence(Fatalaties,fatal,pop,alabama)
 ```{r}
 prevalence <- a/b 
 #take from epi package (this will incorporate time)
+
+#group by state by tidyverse and then do summary statistic based on states 
 ```
 
 #Time component of the function
 ```{r}
 #This may be incorporated elsewhere
+#group by year 
+#group by summarize
+#mutate to add new variable (new column)
 ```
 
 #Map part of the function
@@ -124,6 +129,19 @@ prevalence <- a/b
 plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
 ```
+
+Notes:
+get ggmaps package 
+check our stargazer package to generate a nice output
+explain arguments 
+write function to add column names to refer to the dataset variables we want (state, year, population) 
+survey package in R good example
+join of state name and state abbreviation and keep state abbreviation
+vignette: include links and cite other things (for more further details see...)
+
+Shiny App:
+-drag by year (see changes in incidence of prevalence across years:by state or country)
+-creating a reactive dataset 
 
 
 
