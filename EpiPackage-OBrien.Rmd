@@ -90,22 +90,42 @@ geojson$features <- lapply(geojson$features, function(feat) {
 leaflet() %>% addGeoJSON(geojson)
 ```
 
+Prevalence Function 
 ```{r}
-datpack <- function{m, s, t}{
-  
-  if (s = "alabama"){
-  mapStates <- map("alabama", fill = TRUE, plot = FALSE)
-  leaflet(data = mapStates) %>% addTiles() %>%
-    addPolygons(fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
-  #addPolygons(fillColor = "jail", stroke = FALSE)
+datpack_prevalence <- function{d, a, b, s, t}{
+  # d = dataset, a = number of disease, b = population, s = state, t = time 
+# Measure from a and b
+  prevalence = a/b
+# Including time variable
+  # All time
+  if (t = "all"){
+    
   }
+  else if { 
+    for (t %in% d){
+      
+    }}
+  # One Year
+# Creating map 
+  for (i in length(s)){
+  if (s = "california"){
+  plot_usmap(
+    data = d, values = "prevalence", include = c("CA"), lines = "red"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "red", name = "Prevalence", label = scales::comma
+  ) + 
+  labs(title = "California", subtitle = "These are the states in the Pacific Timezone.") +
+  theme(legend.position = "right")
+  }
+    else {print "none"}
+  }
+  return(prevalence)
 }
 
 ##map = state, national, regio (code for this)
 
 
-leaflet(data = mapStates) %>% addTiles() %>%
-  addPolygons(fillColor = "jail", stroke = FALSE)
 
 
 ```
@@ -130,6 +150,15 @@ plot_usmap(include = c("CA", "ID", "NV", "OR", "WA")) +
   labs(title = "Western US States", subtitle = "These are the states in the Pacific Timezone.")
 
 plot_usmap(data = Fatalities, values = "mormon", lines = "red") + 
-  scale_fill_continuous(name = "Income", label = scales::comma) + 
+  scale_fill_continuous(name = "Mormon", label = scales::comma) + 
+  theme(legend.position = "right")
+
+plot_usmap(
+    data = Fatalities, values = "mormon", include = c("CA", "ID", "NV", "OR", "WA"), lines = "red"
+  ) + 
+  scale_fill_continuous(
+    low = "white", high = "red", name = "Mormon", label = scales::comma
+  ) + 
+  labs(title = "Western US States", subtitle = "These are the states in the Pacific Timezone.") +
   theme(legend.position = "right")
 ```
