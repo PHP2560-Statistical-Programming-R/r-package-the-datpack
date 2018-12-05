@@ -228,25 +228,26 @@ map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="
 
 #Mapping for Region All one Function (Not working)
 ```{r}
-map_region_prevalence <- function(data,existing_cases,population,state,year,region) {
+map_region_prevalence <- function(data,existing_cases,population,state,year,geographic_region) {
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
-    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population),  
+           geographic_region = c("Northeast", "South", "Midwest", "West")) %>%
     
   left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
-    if (region == "Northeast") {
+    if (geographic_region == "Northeast") {
 map_northeast_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    } else if (region =="South") {
+    } else if (geographic_region =="South") {
       map_south_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    } else if (region =="Midwest") {
+    } else if (geographic_region =="Midwest") {
       map_midwest_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
     } else {
       map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
     }
 }
 
-map_region_prevalence(Fatalities,existing_cases= "fatal", population="pop", state="state", year="year", region == "Northeast")
+map_region_prevalence(Fatalities,existing_cases= "fatal", population="pop", state="state", year="year", geographic_region = "Northeast")
 ```
 
 
