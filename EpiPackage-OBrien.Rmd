@@ -17,6 +17,7 @@ library(roxygen2)
 library(leaflet)
 library(maps)
 library(AER)
+library(prevalence)
 ```
 
 Maps- use geom polygon (?) 
@@ -92,20 +93,57 @@ leaflet() %>% addGeoJSON(geojson)
 
 Prevalence Function 
 ```{r}
-datpack_prevalence <- function{d, a, b, s, t}{
-  # d = dataset, a = number of disease, b = population, s = state, t = time 
-# Measure from a and b
-  prevalence = a/b
-# Including time variable
-  # All time
-  if (t = "all"){
-    
+Rprev(Fatalities$fatal, Fatalities$pop)
+datpack_prevalence <- function{data, existing_cases, population, state, time}{
+data %>%
+  group_by(data$state,data$year) %>%
+  mutate(data["prevalence"] = data["existing_cases"]/ data["population"]) %>%
+ggplot(data = states) + 
+  geom_polygon(aes(x = long, y = lat, fill = region, group = group), color = "white") + 
+  coord_fixed(1.3) +
+  guides(fill=prevalence) 
   }
-  else if { 
-    for (t %in% d){
-      
-    }}
-  # One Year
+  # One Year apply across the state mcgrinr package tidyverse, r oxgen explaining argument merge and join and  preprocessing function 
+#filter unique state , state refers to state column 
+
+map_prevalence <- function(data,existing_cases,population,state,year) {
+  data %>%
+    group_by(!! sym(state), !! sym(year)) %>%
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
+  geom_polygon(aes(x = long, y = lat, fill = region, group = group), color = "white") + 
+  coord_fixed(1.3) +
+  guides(fill=prevalence) 
+ditch_the_axes <- theme(
+  axis.text = element_blank(),
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  panel.border = element_blank(),
+  panel.grid = element_blank(),
+  axis.title = element_blank()
+  )
+states <- map_data("state")
+all_states <- ggplot(data = states, mapping = aes(x = long, y = lat, group = group)) + 
+  coord_fixed(1.3) + 
+  geom_polygon(color = "black", fill = "gray")
+all_states
+
+all_states_fatal <- all_states + 
+      geom_polygon(data = Fatalities, aes(fill = fatal), color = "white") +
+      geom_polygon(color = "black", fill = NA) +
+      theme_bw() +
+      ditch_the_axes
+
+all_states_fatal
+  
+  eb2 <- all_states_fatal + 
+    scale_fill_gradientn(colours = rev(rainbow(7)),
+                         breaks = c(2, 4, 10, 100, 1000, 10000),
+                         trans = "log10")
+eb2
+  }
+map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="al",year="1982")
+
+map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="state",year="year")
 # Creating map 
   for (i in length(s)){
   if (s = "california"){
@@ -122,14 +160,13 @@ datpack_prevalence <- function{d, a, b, s, t}{
   }
   return(prevalence)
 }
-
-##map = state, national, regio (code for this)
-
-
-
-
 ```
+truePrev(x, n, SE = 1, SP = 1, prior = c(1, 1),
+nchains = 2, burnin = 10000, update = 10000,
+verbose = FALSE)
 
+
+EXAMPLE CODE:
 ```{r}
 pal <- colorNumeric("viridis", NULL)
 
@@ -142,6 +179,7 @@ leaflet(mapStates) %>%
     labFormat = labelFormat(transform = function(x) round(10^x)))
 ```
 
+EXAMPLE CODE
 ```{r}
 library(usmap)
 library(ggplot2)
@@ -161,4 +199,53 @@ plot_usmap(
   ) + 
   labs(title = "Western US States", subtitle = "These are the states in the Pacific Timezone.") +
   theme(legend.position = "right")
+```
+
+Joining
+```{r}
+library(tidyverse)
+library(fiftystater)
+library(viridis)
+
+tbl <- state.x77 %>%
+  as_tibble(rownames = "state") %>%
+  bind_cols(state_name = str_to_lower(state.abb)) %>%
+  rename(value_x = Income) %>%
+  select(state_name, value_x)
+
+state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
+tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
+  rename(id = state_full)
+
+us_map <- map_data("state")
+Fatalities %>%
+  full_join(state_abbs, (by = "abb" = "state"))
+    tbl_df() %>%
+  mutate(state = rownames(votes.repub),
+         state = tolower(state)) %>%
+  right_join(us_map, by = c("state" = "region")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `fatal`)) +
+  geom_polygon(color = "black") + 
+  theme_void() + 
+  scale_fill_viridis(name = "Republican\fatal (%)")
+
+
+ggplot(tbl_m) +
+  geom_map(map = states, aes(map_id = region, fill = value_x)) + 
+  expand_limits(x = states$long, y = states$lat) +
+  coord_map() +
+  geom_text(
+    data = states %>%
+      group_by(region) %>%
+      summarise(lat = mean(c(max(lat), min(lat))),
+                long = mean(c(max(long), min(long)))) %>%
+      mutate(state = id) %>%
+      left_join(tbl_m, by = c("state" = "id")),
+    aes(x = long, y = lat, label = value_x )
+    ) +
+  scale_fill_viridis() +
+  scale_x_continuous(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "", y = "") + theme(legend.position = "bottom", 
+                               panel.background = element_blank())
 ```

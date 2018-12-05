@@ -38,6 +38,9 @@ library(ggplot2)
 library(dplyr)
 library(tidyverse)
 library(rprev)
+library(ggmap)
+library(mapdata)
+library(viridis)
 ```
 
 #Load sample dataset available in the AER package
@@ -144,16 +147,47 @@ map_prevalence <- function(data,state,year,existing_cases,population) {
 map_prevalence(Fatalities,state="all",year="1982",existing_cases= "fatal",population= "pop")
 ```
 
-#Idea for Built in Prevalence Function
+
+#Working ggmap graph
 ```{r}
-library(ggmap)
+us_map <- map_data("state")
+
+tbl <- state.x77 %>%
+  as_tibble(rownames = "state") %>%
+  bind_cols(state_name = str_to_lower(state.abb)) %>%
+  rename(value_x = Income) %>%
+  select(state_name, value_x)
+
+state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
+tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
+  rename(id = state_full)
+
+Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb")) %>%
+  right_join(us_map, by = c("state_full" = "region")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `fatal`)) +
+  geom_polygon(color = "white") + ggtitle("National Fatalities 1982-1988") +
+  theme_void() + 
+  scale_fill_viridis(name = "Fatalities (Count)") 
 ```
 
 
-#Map part of the function
+
+#Sample Function: Working!! 
 ```{r}
-plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
-  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
+map_prevalence <- function(Fatalities,existing_cases,population,state,year) {
+  Fatalities %>%
+    group_by(!! sym(state), !! sym(year)) %>%
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
+  left_join(state_abbs, by = c("state" = "abb")) %>%
+  right_join(us_map, by = c("state_full" = "region")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `fatal`)) +
+  geom_polygon(color = "white") + ggtitle("National Fatalities 1982-1988") +
+  theme_void() + 
+  scale_fill_viridis(name = "Fatalities (Count)")
+}
+
+map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="state",year="year")
 ```
 
 Notes:
