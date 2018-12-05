@@ -128,7 +128,7 @@ Fatalities %>%
 
 
 
-#Sample Function: Working!! 
+#National Prevalence Function (Working)
 ```{r}
 map_national_prevalence <- function(data,existing_cases,population,state,year) {
   data %>%
@@ -145,7 +145,7 @@ map_national_prevalence <- function(data,existing_cases,population,state,year) {
 map_national_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
-#Mapping for Region: Northeast
+#Mapping for Region: Northeast (Working)
 ```{r}
 map_northeast_prevalence <- function(data,existing_cases,population,state,year) {
   data %>%
@@ -165,7 +165,7 @@ map_northeast_prevalence <- function(data,existing_cases,population,state,year) 
 map_northeast_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
-#Mapping for Region: South
+#Mapping for Region: South (Working)
 ```{r}
 map_south_prevalence <- function(data,existing_cases,population,state,year) {
   data %>%
@@ -186,7 +186,7 @@ map_south_prevalence <- function(data,existing_cases,population,state,year) {
 map_south_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
-#Map for Region: Midwest
+#Map for Region: Midwest (Working)
 ```{r}
 map_midwest_prevalence <- function(data,existing_cases,population,state,year) {
   data %>%
@@ -206,7 +206,7 @@ map_midwest_prevalence <- function(data,existing_cases,population,state,year) {
 map_midwest_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
-#Map for Region: West
+#Map for Region: West (Working)
 ```{r}
 map_west_prevalence <- function(data,existing_cases,population,state,year) {
   data %>%
@@ -226,7 +226,7 @@ map_west_prevalence <- function(data,existing_cases,population,state,year) {
 map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
-#Mapping for Region All one Function
+#Mapping for Region All one Function (Not working)
 ```{r}
 map_region_prevalence <- function(data,existing_cases,population,state,year,region) {
   data %>%
