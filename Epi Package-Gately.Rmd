@@ -97,7 +97,7 @@ map_prevalence <- function(data,state,year,existing_cases,population) {
   return(prevalence)
    #t<- all years or one year
      if (state == "al") {
- plot_usmap(data = Fatalities, values = "prevalence", include ="AL", lines = "black") + 
+ plot_usmap(data = Fatalities, values = prevalence, include = state, lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
      }
   else {
@@ -112,20 +112,32 @@ map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",populat
 #year variable (time)
 ```
 
-#Alternative 
+#Alternative (No if loop for state)
 ```{r}
 map_prevalence <- function(data,state,year,existing_cases,population) {
   data %>%
     group_by(state,year) %>%
-    summarise(prevalence = existing_cases / population) 
- return(prevalence) 
- map<-plot_usmap(data = Fatalities, values = "prevalence", include ="state", lines = "black") + 
-  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
- return(map)    
- }
+    mutate(prevalence = existing_cases / population) %>%
+ map<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
+}
 
 map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
 ```
+#National 
+```{r}
+map_prevalence <- function(data,state,year,existing_cases,population) {
+  data %>%
+    group_by(state,year) %>%
+    mutate(prevalence = existing_cases / population) 
+    for (i in 1:length(state)) 
+ map<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
+  }
+
+map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
+```
+
 
 #Incidence part of function
 ```{r}
