@@ -105,11 +105,23 @@ epi.2by2(dat = as.table(dat), method = "cross.sectional",
 
 
 ```{r}
-library(ggplot2)
-ggplot(data=Fatalities, aes(Fatalities$miles)) + 
-  geom_histogram(col="red",
+
+ggplot(data=Fatalities, aes(Fatalities$income)) + 
+  geom_histogram(aes(y =..density..), 
+                 col="blue", 
+                 fill="grey", 
+                 alpha=.2) + 
+  geom_density(col=2) + 
+  labs(title="Histogram for Age", x="Age", y="Count")
+
+
+#library(ggplot2)
+ggplot(data=Fatalities, aes(income)) + 
+  geom_histogram(col="black",
                  aes(fill=..count..)) +
-  scale_fill_gradient("Count", low="yellow", high="green")
+  scale_fill_gradient("Count", low="light blue", high="navy")+ geom_density() + 
+  labs(title="Histogram for Age", x="Age", y="Count")
+  
 
 ```
 
@@ -198,32 +210,29 @@ epi.2by2
 
 #write a function with an argument to select plot type - set color scheme to match the maps
 
-epiplot<-(x,y,fill, graph)
-
-if(graph = bar){
-
-epi.hist<-function(x,y, data, main, xlab, ylab, notch=TRUE ){         #boxplot function
-  boxplot(x~y, data=data, notch=notch,
-  main="main", xlab="xlab", ylab="ylab")
-} 
+epiplot<- function(data,x,y, graph, fill, title, xlab, ylab, notch=TRUE){
+if(graph = bar){                           #boxplot function
+   barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
 } else if(graph=bargroup){
-  
-}else if(graph=barstack){
-  
-}
-else if(graph=boxplot){                           #add code for dot plots
-  
-} 
-else if(graph=hist){
-ggplot(data=Fatalities, aes(Fatalities$income)) +                     #for histograms - write function
-  geom_histogram(aes(y =..density..), 
-                 col="blue", 
-                 fill="grey", 
-                 alpha=.2) + 
-  geom_density(col=2) + 
-  labs(title="Histogram for Age", x="Age", y="Count")
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~jail)
+} else if(graph=barstack){
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+    geom_bar( stat="identity")
+} else if(graph=boxplot){                           #add code for dot plots
+  boxplot(x~y, data=data, notch=notch,
+  main="title", xlab="xlab", ylab="ylab")
+} else if(graph=hist){
+  ggplot(data=data, aes(x)) +                     #for histograms - write function
+  geom_histogram(col="black", aes(fill=..count..)) +
+  scale_fill_gradient("Count", low="light blue", high="navy")
+  labs(title="title", x="xlab", y="ylab")
 } else if(graph=histcurve){                                   ####add an argument for adding a curve to histogram/scatter
-  
+  ggplot(data=data, aes(x)) +                     #for histograms - write function
+  geom_histogram(col="black", aes(fill=..count..)) +
+  scale_fill_gradient("Count", low="light blue", high="navy")+ 
+  geom_density() + 
+  labs(title="title", x="xlab", y="ylab")
 } else if(graph=scatter){
   
 } else if(graph=line){
@@ -234,17 +243,47 @@ ggplot(data=Fatalities, aes(Fatalities$income)) +                     #for histo
   
 } else if(graph=kaplan){                        #survival
   
-} else if(graph=bubble){
-  
 }
 
-ggplot(data=Fatalities, aes(Fatalities$miles)) +                      #histogram - input in function
-  geom_histogram(col="red",
-                 aes(fill=..count..)) +
-  scale_fill_gradient("Count", low="yellow", high="green")
 
+
+  
+##groupedbar
+  
+  
+  ggplot(data=Fatalities, aes(x=breath, y=income)) +
+  geom_bar(stat="identity")+
+  theme_bw()+ 
+ scale_fill_brewer(palette = "Blues")
+  
+  barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
+  
+  
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+    geom_bar(position="dodge", stat="identity") + scale_fill_gradient("Count", low="light blue", high="navy")
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+    geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Blues")+theme_bw()
+
+  
+  ggplot(Fatalities, aes(y=income, x=breath, color = jail)) +geom_bar( stat="identity")+ scale_fill_brewer(palette = "Blues")+theme_bw()+ facet_wrap(~breath)
+
+  
+  table(Fatalities$jail)
+##how to deal with NAs
+  
+  bars <- c(4, 3, 5, 4.5, 5.1)
+labels <-  c('Anthrax', 'DRI', 'DOA', 'BIOHAZARD', 'Withstand')
+barplot(bars, names.arg = labels, col = brewer.pal(5, name = "Blues"))
+
+is.na(Fatalities$jail)
 ````
 
+```{r}
 
+
+
+
+
+```
 
 
