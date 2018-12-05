@@ -112,6 +112,21 @@ map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",populat
 #year variable (time)
 ```
 
+#Alternative 
+```{r}
+map_prevalence <- function(data,state,year,existing_cases,population) {
+  data %>%
+    group_by(state,year) %>%
+    summarise(prevalence = existing_cases / population) 
+ return(prevalence) 
+ map<-plot_usmap(data = Fatalities, values = "prevalence", include ="state", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
+ return(map)    
+ }
+
+map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
+```
+
 #Incidence part of function
 ```{r}
 prevalence <- a/b 
