@@ -37,6 +37,7 @@ library(usmap)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
+library(rprev)
 ```
 
 #Load sample dataset available in the AER package
@@ -85,7 +86,7 @@ The West comprises Montana, Idaho, Wyoming, Colorado, New Mexico, Arizona, Utah,
 ##NOTE: no data for Alaska or Hawaii
 
 To do: 
-Write function for mapping (state, city, and zip)
+Write function for mapping (state, national)
 within the function, have it first calculate incidence/prevalence, etc. from a predefined previous function
 
 #Function to Write
@@ -93,7 +94,7 @@ within the function, have it first calculate incidence/prevalence, etc. from a p
 map_prevalence <- function(data,state,year,existing_cases,population) {
   data %>%
     group_by(state,year) %>%
-  prevalence = existing_cases / population #a number of cases, b is pop
+  prevalence = existing_cases / population  #a number of cases, b is pop
   return(prevalence)
    #t<- all years or one year
      if (state == "al") {
@@ -105,25 +106,25 @@ map_prevalence <- function(data,state,year,existing_cases,population) {
   }
 }
 
-
 map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
-#state variable (map)
-#fatal variable (incidence) fatal/pop
-#year variable (time)
 ```
 
-#Alternative (No if loop for state)
+#Alternative (No if loop for state) Good one
 ```{r}
-map_prevalence <- function(data,state,year,existing_cases,population) {
+map_prevalence <- function(data,existing_cases,population,state,year) {
+  
   data %>%
-    group_by(state,year) %>%
-    mutate(prevalence = existing_cases / population) %>%
- map<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
+    group_by(!! sym(state), !! sym(year)) %>%
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
+ plot_usmap(data = Fatalities, values = prevalence, include = state, lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
 }
 
-map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
+map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="al",year="1982")
+
+map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="state",year="year")
 ```
+
 #National 
 ```{r}
 map_prevalence <- function(data,state,year,existing_cases,population) {
@@ -131,29 +132,23 @@ map_prevalence <- function(data,state,year,existing_cases,population) {
     group_by(state,year) %>%
     mutate(prevalence = existing_cases / population) 
     for (i in 1:length(state)) 
- map<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
-  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
+      if (state=="all") {
+ national<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "National") + theme(legend.position = "right")
+      }
+  else {
+    break 
   }
+}
 
-map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
+map_prevalence(Fatalities,state="all",year="1982",existing_cases= "fatal",population= "pop")
 ```
 
-
-#Incidence part of function
+#Idea for Built in Prevalence Function
 ```{r}
-prevalence <- a/b 
-#take from epi package (this will incorporate time)
-
-#group by state by tidyverse and then do summary statistic based on states 
+library(ggmap)
 ```
 
-#Time component of the function
-```{r}
-#This may be incorporated elsewhere
-#group by year 
-#group by summarize
-#mutate to add new variable (new column)
-```
 
 #Map part of the function
 ```{r}
@@ -174,5 +169,10 @@ Shiny App:
 -drag by year (see changes in incidence of prevalence across years:by state or country)
 -creating a reactive dataset 
 
+-identify one state or one year: 
+filter step (unique state)
+filter year (unique year)
+specific_state in argument
+specific_year in argument
 
 
