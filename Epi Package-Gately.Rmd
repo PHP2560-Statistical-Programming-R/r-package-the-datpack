@@ -226,6 +226,29 @@ map_west_prevalence <- function(data,existing_cases,population,state,year) {
 map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
+#Mapping for Region All one Function
+```{r}
+map_region_prevalence <- function(data,existing_cases,population,state,year,region) {
+  data %>%
+    group_by(!! sym(state), !! sym(year)) %>%
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
+    
+  left_join(state_abbs, by = c("state" = "abb")) %>%
+  right_join(us_map, by = c("state_full" = "region")) %>%
+    if (region == "Northeast") {
+map_northeast_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+    } else if (region =="South") {
+      map_south_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+    } else if (region =="Midwest") {
+      map_midwest_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+    } else {
+      map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+    }
+}
+
+map_region_prevalence(Fatalities,existing_cases= "fatal", population="pop", state="state", year="year", region == "Northeast")
+```
+
 
 #Mapping for Specific Year
 ```{r}
