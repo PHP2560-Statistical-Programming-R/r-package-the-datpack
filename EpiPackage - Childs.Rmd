@@ -212,11 +212,13 @@ epi.2by2
 
 epiplot<- function(data,x,y, graph, fill, title, xlab, ylab, notch=TRUE){
 if(graph = bar){                           #boxplot function
- 
+   barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
 } else if(graph=bargroup){
-  
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~jail)
 } else if(graph=barstack){
-  
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+    geom_bar( stat="identity")
 } else if(graph=boxplot){                           #add code for dot plots
   boxplot(x~y, data=data, notch=notch,
   main="title", xlab="xlab", ylab="ylab")
@@ -248,12 +250,24 @@ if(graph = bar){                           #boxplot function
   
 ##groupedbar
   
+  
+  ggplot(data=Fatalities, aes(x=breath, y=income)) +
+  geom_bar(stat="identity")+
+  theme_bw()+ 
+ scale_fill_brewer(palette = "Blues")
+  
+  barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
+  
+  
   ggplot(data, aes(fill=fill, y=y, x=x)) +
     geom_bar(position="dodge", stat="identity") + scale_fill_gradient("Count", low="light blue", high="navy")
-  
-  ggplot(Fatalities, aes(fill=jail, y=income, x=service)) +
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
     geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Blues")+theme_bw()
 
+  
+  ggplot(Fatalities, aes(y=income, x=breath, color = jail)) +geom_bar( stat="identity")+ scale_fill_brewer(palette = "Blues")+theme_bw()+ facet_wrap(~breath)
+
+  
   table(Fatalities$jail)
 ##how to deal with NAs
   
