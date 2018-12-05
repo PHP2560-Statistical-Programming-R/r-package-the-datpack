@@ -175,19 +175,39 @@ Fatalities %>%
 
 #Sample Function: Working!! 
 ```{r}
-map_prevalence <- function(Fatalities,existing_cases,population,state,year) {
-  Fatalities %>%
+map_national_prevalence <- function(data,existing_cases,population,state,year) {
+  data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
   left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
-  ggplot(aes(x = long, y = lat, group = group, fill = `fatal`)) +
-  geom_polygon(color = "white") + ggtitle("National Fatalities 1982-1988") +
+  ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+  geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
   theme_void() + 
-  scale_fill_viridis(name = "Fatalities (Count)")
+  scale_fill_viridis(name = "Prevalence")
 }
 
-map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="state",year="year")
+map_national_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+```
+
+#Mapping for Specific Year
+```{r}
+map_national_prevalence <- function(data,existing_cases,population,state,year,specific_year) {
+  data %>%
+    group_by(!! sym(state), !! sym(year)) %>%
+  mutate(prevalence = !! sym(existing_cases) / !!sym(population),
+         specific_year = distinct(!! sym(year))) %>%
+  filter(!! sym(year) == specific_year) %>%
+      
+  left_join(state_abbs, by = c("state" = "abb")) %>%
+  right_join(us_map, by = c("state" = "region")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+  geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
+  theme_void() + 
+  scale_fill_viridis(name = "Prevalence")
+}
+
+map_national_prevalence(Fatalities,existing_cases="fatal",population="pop",state="state",year="year",specific_year == "1982")
 ```
 
 Notes:
