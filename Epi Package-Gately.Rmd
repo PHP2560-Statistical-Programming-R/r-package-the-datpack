@@ -32,11 +32,11 @@ library(epiDisplay)
 library(devtools)
 library(roxygen2)
 library(epicalc)
-library(leaflet)
 library(maps)
 library(usmap)
 library(ggplot2)
 library(dplyr)
+library(tidyverse)
 ```
 
 #Load sample dataset available in the AER package
@@ -90,19 +90,23 @@ within the function, have it first calculate incidence/prevalence, etc. from a p
 
 #Function to Write
 ```{r}
-map_prevalence <- function(d,a,b,s,t) {
-  d <- dataset   #imput dataset
-  prevalence <- a/b #a number of cases, b is pop
+map_prevalence <- function(data,state,year,existing_cases,population) {
+  data %>%
+    group_by(state,year) %>%
+  prevalence = existing_cases / population #a number of cases, b is pop
   return(prevalence)
    #t<- all years or one year
-  s <- state[[i]] #group by state 
-     if (i == "alabama") {
- plot_usmap(data = Fatalities, values = "fatal", include ="AL", lines = "black") + 
+     if (state == "al") {
+ plot_usmap(data = Fatalities, values = "prevalence", include ="AL", lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
      }
+  else {
+    break
   }
+}
 
-map_prevalence(Fatalaties,fatal,pop,alabama)
+
+map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
 #state variable (map)
 #fatal variable (incidence) fatal/pop
 #year variable (time)
