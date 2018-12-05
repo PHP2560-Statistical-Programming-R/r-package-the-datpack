@@ -210,7 +210,7 @@ epi.2by2
 
 #write a function with an argument to select plot type - set color scheme to match the maps
 
-epiplot<- function(data,x,y, graph, fill, title, xlab, ylab, notch=TRUE){
+epiplot<- function(data,x,y, graph, fill, title, xlab, ylab, legend, notch=TRUE){
 if(graph = bar){                           #boxplot function
    barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
 } else if(graph=bargroup){
@@ -234,7 +234,11 @@ if(graph = bar){                           #boxplot function
   geom_density() + 
   labs(title="title", x="xlab", y="ylab")
 } else if(graph=scatter){
-  
+  ggplot(data, aes(x, y, color = fill)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(low = "light blue", high = "dark blue")+
+  labs(title="title", x="xlab", y="ylab", color = "legend")
 } else if(graph=line){
   
 } else if(graph=bubble){
@@ -245,6 +249,8 @@ if(graph = bar){                           #boxplot function
   
 }
 
+  
+  print a function with parmfrow
 
 
   
@@ -258,6 +264,8 @@ if(graph = bar){                           #boxplot function
   
   barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
   
+  
+plot_ly(Fatalities, x =~income, y = ~drinkage, color = ~income, size = ~income)
   
   ggplot(data, aes(fill=fill, y=y, x=x)) +
     geom_bar(position="dodge", stat="identity") + scale_fill_gradient("Count", low="light blue", high="navy")
@@ -276,6 +284,39 @@ labels <-  c('Anthrax', 'DRI', 'DOA', 'BIOHAZARD', 'Withstand')
 barplot(bars, names.arg = labels, col = brewer.pal(5, name = "Blues"))
 
 is.na(Fatalities$jail)
+
+
+plot_ly(Fatalities, x =~income, y = ~fatal, color = ~income, size = ~income)
+
+
+p<-plot_ly(Fatalities, x =~income, y = ~fatal,  type="scatter", mode = "markers", marker=list( size=20 , opacity=0.5),
+        color = ~drinkage, colors=c("light blue","dark blue") %>%
+          layout(title = 'Primates Brain and Body Weight',
+         xaxis = list(title = 'Body Weight (kg)'),
+         yaxis = list(title = 'Brain Weight (g)'))
+p
+
+ggplot(Fatalities, aes(income, fatal, color = drinkage)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(low = "light blue", high = "dark blue")+
+  labs(title="title", x="xlab", y="ylab", color = "Drinks")
+
+ggplot(data = dfm, aes(x = TY, y = value, color = variable)) + 
+  geom_point(size=5) +
+  labs(title = "Temperatures\n", x = "TY [°C]", y = "Txxx", color = "") +
+  scale_color_manual(labels = c("T999", "T888"), values = c("blue", "red")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 14), axis.title.x = element_text(size = 16),
+        axis.text.y = element_text(size = 14), axis.title.x = element_text(size = 16),
+        plot.title = element_text(size = 20, face = "bold", color = "darkgreen"))
+
+
+iris, x = ~Petal.Length, y = ~Petal.Width , type="scatter", mode = "markers",
+        marker=list( size=20 , opacity=0.5), color = ~Sepal.Length ,
+        colors=c("green","blue")
+
+
 ````
 
 ```{r}
