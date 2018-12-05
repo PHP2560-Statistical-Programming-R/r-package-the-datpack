@@ -37,6 +37,7 @@ library(usmap)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
+library(prevalence)
 ```
 
 #Load sample dataset available in the AER package
@@ -105,7 +106,6 @@ map_prevalence <- function(data,state,year,existing_cases,population) {
   }
 }
 
-
 map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
 #state variable (map)
 #fatal variable (incidence) fatal/pop
@@ -118,12 +118,13 @@ map_prevalence <- function(data,state,year,existing_cases,population) {
   data %>%
     group_by(state,year) %>%
     mutate(prevalence = existing_cases / population) %>%
- map<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
+ plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
 }
 
-map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
+map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population="pop")
 ```
+
 #National 
 ```{r}
 map_prevalence <- function(data,state,year,existing_cases,population) {
@@ -131,11 +132,29 @@ map_prevalence <- function(data,state,year,existing_cases,population) {
     group_by(state,year) %>%
     mutate(prevalence = existing_cases / population) 
     for (i in 1:length(state)) 
- map<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
+ national<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
   scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
   }
 
-map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
+map_prevalence(Fatalities,state="national",year="1982",existing_cases= "fatal",population= "pop")
+```
+
+#Idea for Built in Prevalence Function
+```{r}
+
+truePrev(x, n, SE = 1, SP = 1, prior = c(1, 1),
+nchains = 2, burnin = 10000, update = 10000,
+verbose = FALSE)
+
+map_prevalence <- function(data,state,year,existing_cases,population) {
+  data %>%
+    group_by(state,year) %>%
+    mutate(prevalence = existing_cases / population) %>%
+ plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
+  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
+}
+
+map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population="pop")
 ```
 
 
