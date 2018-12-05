@@ -18,6 +18,23 @@ epi.box(Fatalities$income, Fatalities$jail, data=Fatalities)
 ```
 
 ```{r}
+#using plotly
+
+#plot_ly(Fatalities, y = ~income, color = I("black")), 
+            # alpha = 0.1, boxpoints = "suspectedoutliers")
+p <- plot_ly(y = ~Fatalities$income, type = "box", boxpoints = "all", jitter = 0.3,
+        pointpos = -1.8) #%>%
+
+
+  #add_trace(y = ~Fatalities$income)
+p
+
+plot_ly(Fatalities,x=~breath, y = ~income, color=~jail, type = "box", boxpoints = "all", jitter = 0.3,
+        pointpos = -1.8) %>%
+  layout(boxmode = "group")
+```
+
+```{r}
 epi.hist<-function(x,y, data, main, xlab, ylab, notch=TRUE ){
   boxplot(x~y, data=data, notch=notch,
   main="main", xlab="xlab", ylab="ylab")
@@ -84,6 +101,7 @@ library(epiDisplay)
 library(epicalc)
 library(devtools)
 library(roxygen2)
+library(plotly)
 ```
   
 ```{r}
@@ -101,6 +119,26 @@ To include:
   mcnemar's test
 
 
+PLOTLY!!!!!!!! - no 3d plots
+
+stargazer pckg
+create basic statistics - stargazer to generate
+produce stats and put into a table 
+
+
+shiny app - drag by year - scroll bar by year - define axis as based on the data
+
+broom to tidy into a table
+
+function to produce table with all their measures - beautify tables
+
+r oxygen will generate manual 
+
+write function that formats data the way we want it to - enter column names
+naming mechanism for variables and columns - survey makes you identify
+function renames dataset with prevalence, incidence - output just anoter dataset
+
+include links in the vignetts - explain and then for future details - insert links
 
 1.
 2.
