@@ -5,8 +5,18 @@ Packages to use: 	epiR, incidence, epitools, epicalc, Epi
 
 #http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/resources/R/packages.pdf
 
+library(RColorBrewer)
 #summary tables and statistics - create & visualize
 ```
+
+```{r}
+
+ggplot(data=Fatalities, aes(x=jail, y=breath)) + geom_bar(stat="identity", color="blue", fill="white")
+
+ggplot(Fatalities, aes(x=jail, y=drinkage, color=breath)) +
+  geom_bar(stat="identity", fill="white")
+```
+
 
 ```{r}
 epi.box<-function(x,y, data, main, xlab, ylab, notch=TRUE ){
@@ -46,6 +56,26 @@ epi.box(Fatalities$income, Fatalities$jail, data=Fatalities)
 epi.dens<-
 ```
 
+```{r}
+  
+#using plotly()
+ 
+plot_ly(Fatalities, x = ~income, type = "histogram") 
+
+plot_ly(Fatalities) %>% add_histogram(name = "Income")
+
+price_hist <- function(method = "FD") {
+  h <- hist(diamonds$price, breaks = method, plot = FALSE)
+  plot_ly(x = h$mids, y = h$counts) %>% add_bars(name = method)
+}
+
+
+plot_ly(Fatalities, x = ~breath, color = ~jail) %>%
+  add_histogram()
+
+  
+```
+
 ```{r}  
 ggplot(data=Fatalities, aes(Fatalities$income)) + 
   geom_histogram(aes(y =..density..), 
@@ -80,6 +110,19 @@ ggplot(data=Fatalities, aes(Fatalities$miles)) +
   geom_histogram(col="red",
                  aes(fill=..count..)) +
   scale_fill_gradient("Count", low="yellow", high="green")
+
+```
+
+
+```{r}
+#scatterplots
+#ggplot2
+
+
+
+
+
+#plotly
 
 ```
 
@@ -149,3 +192,59 @@ use wcgs to test
 epi.2by2
 
 ```
+
+
+```{r}
+
+#write a function with an argument to select plot type - set color scheme to match the maps
+
+epiplot<-(x,y,fill, graph)
+
+if(graph = bar){
+
+epi.hist<-function(x,y, data, main, xlab, ylab, notch=TRUE ){         #boxplot function
+  boxplot(x~y, data=data, notch=notch,
+  main="main", xlab="xlab", ylab="ylab")
+} 
+} else if(graph=bargroup){
+  
+}else if(graph=barstack){
+  
+}
+else if(graph=boxplot){                           #add code for dot plots
+  
+} 
+else if(graph=hist){
+ggplot(data=Fatalities, aes(Fatalities$income)) +                     #for histograms - write function
+  geom_histogram(aes(y =..density..), 
+                 col="blue", 
+                 fill="grey", 
+                 alpha=.2) + 
+  geom_density(col=2) + 
+  labs(title="Histogram for Age", x="Age", y="Count")
+} else if(graph=histcurve){                                   ####add an argument for adding a curve to histogram/scatter
+  
+} else if(graph=scatter){
+  
+} else if(graph=line){
+  
+} else if(graph=bubble){
+  
+} else if(graph=linreg){
+  
+} else if(graph=kaplan){                        #survival
+  
+} else if(graph=bubble){
+  
+}
+
+ggplot(data=Fatalities, aes(Fatalities$miles)) +                      #histogram - input in function
+  geom_histogram(col="red",
+                 aes(fill=..count..)) +
+  scale_fill_gradient("Count", low="yellow", high="green")
+
+````
+
+
+
+
