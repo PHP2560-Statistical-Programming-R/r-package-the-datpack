@@ -92,25 +92,6 @@ To do:
 Write function for mapping (state, national)
 within the function, have it first calculate incidence/prevalence, etc. from a predefined previous function
 
-#Function to Write
-```{r}
-map_prevalence <- function(data,state,year,existing_cases,population) {
-  data %>%
-    group_by(state,year) %>%
-  prevalence = existing_cases / population  #a number of cases, b is pop
-  return(prevalence)
-   #t<- all years or one year
-     if (state == "al") {
- plot_usmap(data = Fatalities, values = prevalence, include = state, lines = "black") + 
-  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Alabama") + theme(legend.position = "right")
-     }
-  else {
-    break
-  }
-}
-
-map_prevalence(Fatalities,state="al",year="1982",existing_cases= "fatal",population= "pop")
-```
 
 #Alternative (No if loop for state) Good one
 ```{r}
@@ -128,24 +109,6 @@ map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="al",ye
 map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="state",year="year")
 ```
 
-#National 
-```{r}
-map_prevalence <- function(data,state,year,existing_cases,population) {
-  data %>%
-    group_by(state,year) %>%
-    mutate(prevalence = existing_cases / population) 
-    for (i in 1:length(state)) 
-      if (state=="all") {
- national<-plot_usmap(data = Fatalities, values = "prevalence", include = "state", lines = "black") + 
-  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "National") + theme(legend.position = "right")
-      }
-  else {
-    break 
-  }
-}
-
-map_prevalence(Fatalities,state="all",year="1982",existing_cases= "fatal",population= "pop")
-```
 
 
 #Working ggmap graph
@@ -190,6 +153,28 @@ map_national_prevalence <- function(data,existing_cases,population,state,year) {
 map_national_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
+#Mapping for Region: Northeast
+```{r}
+map_national_prevalence <- function(data,existing_cases,population,state,year) {
+  data %>%
+    group_by(!! sym(state), !! sym(year)) %>%
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
+    
+  left_join(state_abbs, by = c("state" = "abb")) %>%
+  right_join(us_map, by = c("state_full" = "region")) %>%
+    
+    filter(!! sym(state) %in% c("ma","ri","ct","me","vt","nh","ny","nj","pa")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+  geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
+  theme_void() + 
+  scale_fill_viridis(name = "Prevalence")
+}
+
+map_national_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+```
+
+
+
 #Mapping for Specific Year
 ```{r}
 map_national_prevalence <- function(data,existing_cases,population,state,year,specific_year) {
@@ -209,6 +194,8 @@ map_national_prevalence <- function(data,existing_cases,population,state,year,sp
 
 map_national_prevalence(Fatalities,existing_cases="fatal",population="pop",state="state",year="year",specific_year == "1982")
 ```
+
+good website: http://rdpeng.github.io/RProgDA/mapping.html 
 
 Notes:
 get ggmaps package 
