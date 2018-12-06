@@ -5,26 +5,42 @@ Packages to use: 	epiR, incidence, epitools, epicalc, Epi
 
 #http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/resources/R/packages.pdf
 
-library(RColorBrewer)
 #summary tables and statistics - create & visualize
 ```
+```{r}
+library(epiR)
+library(epitools)
+library(incidence)
+library(Epi)
+library(epiDisplay)
+library(epicalc)
+library(devtools)
+library(roxygen2)
+library(plotly)
+library(ggplot2)
+library(RColorBrewer)
+library(AER)
+
+data("Fatalities")
+
+#if comments for when people don't read instructions
+```
 
 ```{r}
+test<-Fatalities[complete.cases(Fatalities),]
+test1<-na.omit(Fatalities)
+ggplot(data=test, aes(x=jail, y=breath)) + geom_bar(stat="identity")
 
-ggplot(data=Fatalities, aes(x=jail, y=breath)) + geom_bar(stat="identity", color="blue", fill="white")
-
-ggplot(Fatalities, aes(x=jail, y=drinkage, color=breath)) +
-  geom_bar(stat="identity", fill="white")
 ```
 
 
 ```{r}
-epi.box<-function(x,y, data, main, xlab, ylab, notch=TRUE ){
-  boxplot(x~y, data=data, notch=notch,
-  main="main", xlab="xlab", ylab="ylab")
+#boxplots
+epi.box<-function(x,y, data, title, xlab, ylab){  #OR epi.box<-function(data, x,y, title, xlab, ylab){
+  boxplot(y~x, data=data, notch=TRUE,
+  main=title, xlab=xlab, ylab=ylab)
 } 
-
-epi.box(Fatalities$income, Fatalities$jail, data=Fatalities)
+epi.box(Fatalities$jail, Fatalities$income, data=Fatalities, title="main1", xlab="xlab", ylab="ylab")
 ```
 
 ```{r}
@@ -138,27 +154,192 @@ ggplot(data=Fatalities, aes(income)) +
 
 ```
 
-```{r}
-library(AER)
 
-data("Fatalities")
-
-
-
-
-if comments for when people don't read instructions
-
-library(epiR)
-library(epitools)
-library(incidence)
-library(Epi)
-library(epiDisplay)
-library(epicalc)
-library(devtools)
-library(roxygen2)
-library(plotly)
-```
   
+
+
+
+```{r}
+library(ggplot2)
+#write a function with an argument to select plot type - set color scheme to match the maps
+
+epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
+  data[complete.cases(data), ]
+  if(graph == "bar"){                           #boxplot function
+  table1 = table(data$x)  ## get the cross tab
+  barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
+  #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
+} else if(graph=="bargroup"){
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~jail)
+} else if(graph=="barstack"){
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+    geom_bar( stat="identity")
+} else if(graph=="boxplot"){                           #add code for dot plots
+  boxplot(x~y, data=data, notch=TRUE,
+  main="title", xlab="xlab", ylab="ylab")
+} else if(graph=="hist"){
+  ggplot(data=data, aes(x)) +                     #for histograms - write function
+  geom_histogram(col="black", aes(fill=..count..)) +
+  scale_fill_gradient("Count", low="light blue", high="navy")
+  labs(title="title", x="xlab", y="ylab")
+} else if(graph=="histcurve"){                      
+  ggplot(data=data, aes(x)) +                     #for histograms - write function
+  geom_histogram(col="black", aes(fill=..count..)) +
+  scale_fill_gradient("Count", low="light blue", high="navy")+ 
+  geom_density() + 
+  labs(title="title", x="xlab", y="ylab")
+} else if(graph=="scatter"){
+  pic=ggplot(data, aes(x, y, color = fill)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(color = "Blues")+
+  labs(title="title", x="xlab", y="ylab", color = "legend")
+} else if(graph=="scatterline"){
+  ggplot(data, aes(x, y, color = fill)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(low = "light blue", high = "dark blue")+
+  labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
+} else if(graph=="linreg"){
+  ggplot(data, aes(x, y, color = fill)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(low = "light blue", high = "dark blue")+
+  labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
+} 
+  return(pic)
+}
+
+data1.1<-  Fatalities[complete.cases(Fatalities), ]
+
+
+pic = graph & return(pic within each step - change colors to continuous scale
+epiplot(data = data1.1, x=breath,graph = "bar")
+
+class(data1.1$breath)
+xlim(Fatalities$breath)
+lims(Fatalities$breath)
+#Fatalities, aes(income, fatal, color = drinkage
+#<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
+
+ggplot(data=data1.1, aes(x=jail, y=drinkage)) +geom_bar(stat="identity")+facet_wrap(data1.1$jail)
+
+table1 = table(data$x)  ## get the cross tab
+barplot(table1, beside = TRUE, legend = levels(data$x)) 
+
+table1 = table(Fatalities$breath)  ## get the cross tab
+barplot(table1, beside = TRUE, legend = levels(Fatalities$breath)) 
+
+barplot.default(table(data1.1$jail), col = c("lightblue", "darkblue"), main = "title", xlab = "xlab", ylab = "ylab")
+  #else if(graph=kaplan){                        #survival
+#}
+ # print a function with parmfrow
+  #ggplot(Fatalities, aes(income, fatal, color = drinkage)) +
+  #geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  #theme_minimal() +
+  #scale_color_gradient(low = "light blue", high = "dark blue")+
+  #labs(title="title", x="xlab", y="ylab", color = "Drinks")+geom_smooth(method = 'lm', se = TRUE)
+````
+
+```{r}
+#test
+
+mtcars<-mtcars
+counts <- table(mtcars$gear)
+barplot(counts, main="Car Distribution", 
+  	xlab="Number of Gears")
+
+
+fxn1<- function(data, x){    ###add argument for error bars
+  table1 <- table(data$x) ## get the cross tab
+  barplot(table1)  
+}
+
+fxn1(data = mtcars, x=gear)
+table1
+
+table1 = table(data1.1$breath)  ## get the cross tab
+  pic<-barplot(table1, beside = TRUE, legend = levels(data1.1$breath), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
+
+  #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
+
+
+is.na(Fatalities$jail)
+
+dat1<-complete.cases(Fatalities)
+table(dat1)
+```
+
+```{r}
+
+
+ggplot(data=Fatalities, aes(x=breath, y=income)) +
+  geom_bar(stat="identity")+
+  theme_bw()+ 
+ scale_fill_brewer(palette = "Blues")
+  
+  barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
+  
+  
+plot_ly(Fatalities, x =~income, y = ~drinkage, color = ~income, size = ~income)
+  
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+    geom_bar(position="dodge", stat="identity") + scale_fill_gradient("Count", low="light blue", high="navy")
+  ggplot(data, aes(fill=fill, y=y, x=x)) +
+    geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Blues")+theme_bw()
+
+  
+  ggplot(Fatalities, aes(y=income, x=breath, color = jail)) +geom_bar( stat="identity")+ scale_fill_brewer(palette = "Blues")+theme_bw()+ facet_wrap(~breath)
+
+  
+  table(Fatalities$jail)
+##how to deal with NAs
+  
+  bars <- c(4, 3, 5, 4.5, 5.1)
+labels <-  c('Anthrax', 'DRI', 'DOA', 'BIOHAZARD', 'Withstand')
+barplot(bars, names.arg = labels, col = brewer.pal(5, name = "Blues"))
+
+is.na(Fatalities$jail)
+
+
+plot_ly(Fatalities, x =~income, y = ~fatal, color = ~income, size = ~income)
+
+
+p<-plot_ly(Fatalities, x =~income, y = ~fatal,  type="scatter", mode = "markers", marker=list( size=20 , opacity=0.5),
+        color = ~drinkage, colors=c("light blue","dark blue") %>%
+          layout(title = 'Primates Brain and Body Weight',
+         xaxis = list(title = 'Body Weight (kg)'),
+         yaxis = list(title = 'Brain Weight (g)'))
+p
+
+ggplot(Fatalities, aes(income, fatal, color = drinkage)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(low = "light blue", high = "dark blue")+
+  labs(title="title", x="xlab", y="ylab", color = "Drinks")+geom_smooth()
+
+
+
+
+ggplot(data = dfm, aes(x = TY, y = value, color = variable)) + 
+  geom_point(size=5) +
+  labs(title = "Temperatures\n", x = "TY [°C]", y = "Txxx", color = "") +
+  scale_color_manual(labels = c("T999", "T888"), values = c("blue", "red")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 14), axis.title.x = element_text(size = 16),
+        axis.text.y = element_text(size = 14), axis.title.x = element_text(size = 16),
+        plot.title = element_text(size = 20, face = "bold", color = "darkgreen"))
+
+
+iris, x = ~Petal.Length, y = ~Petal.Width , type="scatter", mode = "markers",
+        marker=list( size=20 , opacity=0.5), color = ~Sepal.Length ,
+        colors=c("green","blue")
+
+
+
+```
+
 ```{r}
 To include:
   2x2 table
@@ -204,127 +385,3 @@ use wcgs to test
 epi.2by2
 
 ```
-
-
-```{r}
-
-#write a function with an argument to select plot type - set color scheme to match the maps
-
-epiplot<- function(data,x,y, graph, fill, title, xlab, ylab, legend, notch=TRUE){
-if(graph = bar){                           #boxplot function
-   barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
-} else if(graph=bargroup){
-  ggplot(data, aes(fill=fill, y=y, x=x)) +
-  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~jail)
-} else if(graph=barstack){
-  ggplot(data, aes(fill=fill, y=y, x=x)) +
-    geom_bar( stat="identity")
-} else if(graph=boxplot){                           #add code for dot plots
-  boxplot(x~y, data=data, notch=notch,
-  main="title", xlab="xlab", ylab="ylab")
-} else if(graph=hist){
-  ggplot(data=data, aes(x)) +                     #for histograms - write function
-  geom_histogram(col="black", aes(fill=..count..)) +
-  scale_fill_gradient("Count", low="light blue", high="navy")
-  labs(title="title", x="xlab", y="ylab")
-} else if(graph=histcurve){                                   ####add an argument for adding a curve to histogram/scatter
-  ggplot(data=data, aes(x)) +                     #for histograms - write function
-  geom_histogram(col="black", aes(fill=..count..)) +
-  scale_fill_gradient("Count", low="light blue", high="navy")+ 
-  geom_density() + 
-  labs(title="title", x="xlab", y="ylab")
-} else if(graph=scatter){
-  ggplot(data, aes(x, y, color = fill)) +
-  geom_point(shape = 16, size = 5, show.legend = TRUE) +
-  theme_minimal() +
-  scale_color_gradient(low = "light blue", high = "dark blue")+
-  labs(title="title", x="xlab", y="ylab", color = "legend")
-} else if(graph=line){
-  
-} else if(graph=bubble){
-  
-} else if(graph=linreg){
-  
-} else if(graph=kaplan){                        #survival
-  
-}
-
-  
-  print a function with parmfrow
-
-
-  
-##groupedbar
-  
-  
-  ggplot(data=Fatalities, aes(x=breath, y=income)) +
-  geom_bar(stat="identity")+
-  theme_bw()+ 
- scale_fill_brewer(palette = "Blues")
-  
-  barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
-  
-  
-plot_ly(Fatalities, x =~income, y = ~drinkage, color = ~income, size = ~income)
-  
-  ggplot(data, aes(fill=fill, y=y, x=x)) +
-    geom_bar(position="dodge", stat="identity") + scale_fill_gradient("Count", low="light blue", high="navy")
-  ggplot(data, aes(fill=fill, y=y, x=x)) +
-    geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Blues")+theme_bw()
-
-  
-  ggplot(Fatalities, aes(y=income, x=breath, color = jail)) +geom_bar( stat="identity")+ scale_fill_brewer(palette = "Blues")+theme_bw()+ facet_wrap(~breath)
-
-  
-  table(Fatalities$jail)
-##how to deal with NAs
-  
-  bars <- c(4, 3, 5, 4.5, 5.1)
-labels <-  c('Anthrax', 'DRI', 'DOA', 'BIOHAZARD', 'Withstand')
-barplot(bars, names.arg = labels, col = brewer.pal(5, name = "Blues"))
-
-is.na(Fatalities$jail)
-
-
-plot_ly(Fatalities, x =~income, y = ~fatal, color = ~income, size = ~income)
-
-
-p<-plot_ly(Fatalities, x =~income, y = ~fatal,  type="scatter", mode = "markers", marker=list( size=20 , opacity=0.5),
-        color = ~drinkage, colors=c("light blue","dark blue") %>%
-          layout(title = 'Primates Brain and Body Weight',
-         xaxis = list(title = 'Body Weight (kg)'),
-         yaxis = list(title = 'Brain Weight (g)'))
-p
-
-ggplot(Fatalities, aes(income, fatal, color = drinkage)) +
-  geom_point(shape = 16, size = 5, show.legend = TRUE) +
-  theme_minimal() +
-  scale_color_gradient(low = "light blue", high = "dark blue")+
-  labs(title="title", x="xlab", y="ylab", color = "Drinks")
-
-ggplot(data = dfm, aes(x = TY, y = value, color = variable)) + 
-  geom_point(size=5) +
-  labs(title = "Temperatures\n", x = "TY [°C]", y = "Txxx", color = "") +
-  scale_color_manual(labels = c("T999", "T888"), values = c("blue", "red")) +
-  theme_bw() +
-  theme(axis.text.x = element_text(size = 14), axis.title.x = element_text(size = 16),
-        axis.text.y = element_text(size = 14), axis.title.x = element_text(size = 16),
-        plot.title = element_text(size = 20, face = "bold", color = "darkgreen"))
-
-
-iris, x = ~Petal.Length, y = ~Petal.Width , type="scatter", mode = "markers",
-        marker=list( size=20 , opacity=0.5), color = ~Sepal.Length ,
-        colors=c("green","blue")
-
-
-````
-
-```{r}
-
-
-
-
-
-```
-
-
