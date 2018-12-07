@@ -134,7 +134,7 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
   scale_fill_gradient("Count", low="light blue", high="navy")+
   labs(title="title", x="xlab", y="ylab")
   return(pic)
-} else if(graph=="histcurve"){                                          #GOOD                  
+} else if(graph=="densityhist"){                                          #GOOD                  
    pic<-ggplot(data=data, aes(x)) + 
   geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
   geom_density(col=2) + 
@@ -164,29 +164,16 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
 } 
 }
 
+```
+
+```{r}
 epiplot(Fatalities, x=Fatalities$service, graph = "bar") 
-
-table1 = table(data$x)  ## get the cross tab
-  pic<-barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
-  return(pic)
-  #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
-
-  
-  ggplot(Fatalities, aes(x=as.factor(service), fill=as.factor(service) )) + geom_bar( ) +
-  scale_fill_brewer(palette = "Paired")
-  
- change colors to continuous scale
-epiplot(data = test, x=test$jail ,graph = "bar")
 
 class(data1.1$breath)
 xlim(Fatalities$breath)
 lims(Fatalities$breath)
 #Fatalities, aes(income, fatal, color = drinkage
 #<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
-
-ggplot(data=data1.1, aes(x=jail, y=drinkage)) +geom_bar(stat="identity")+facet_wrap(data1.1$jail)
-
-
 ```
 
 ```{r}
@@ -216,7 +203,6 @@ mtcars<-mtcars
 counts <- table(mtcars$gear)
 barplot(counts, main="Car Distribution", 
   	xlab="Number of Gears")
-
 
 fxn1<- function(data, x){    ###add argument for error bars
   table1 <- table(data$x) ## get the cross tab
@@ -314,15 +300,7 @@ To include:
   rate ratio
   risk ratio
   odds ratio
-  CIs
-  exploratory
-  ttest
-  univariate analysis
-  multivariate analysis
-  mcnemar's test
-
-
-PLOTLY!!!!!!!! - no 3d plots
+  CIs   ###****add CIs???
 
 stargazer pckg
 create basic statistics - stargazer to generate
@@ -341,13 +319,7 @@ write function that formats data the way we want it to - enter column names
 naming mechanism for variables and columns - survey makes you identify
 function renames dataset with prevalence, incidence - output just anoter dataset
 
-include links in the vignetts - explain and then for future details - insert links
-
-1.
-2.
-3.
-use wcgs to test
-  
+include links in the vignettes - explain and then for future details - insert links
 
 epi.2by2
 
