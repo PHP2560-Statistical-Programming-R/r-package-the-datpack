@@ -109,9 +109,9 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
   pic<-barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
   return(pic)
   #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
-} else if(graph=="bargroup"){
-  pic<-ggplot(data, aes(fill=fill, y=y, x=x)) +
-  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~fill)
+} else if(graph=="bargroup"){                                           #works, but has column for NAs....why???
+  pic<-ggplot(data, aes(x=x, y=y, fill=fill)) +
+  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~"fill")
   return(pic)
 } else if(graph=="barstack"){                                           #works, but has column for NAs....why???
   pic<-ggplot(data, aes(fill=fill, y=y, x=x)) +
@@ -160,11 +160,13 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
 } 
 }
 
-epiplot(Fatalities, x=Fatalities$service, y=Fatalities$income, graph = "barsgroup", fill = Fatalities$breath) 
+epiplot(Fatalities, x=Fatalities$service, y=Fatalities$income, graph = "bargroup", fill = Fatalities$breath) 
 
- ggplot(Fatalities, aes(fill=breath, y=income, x=service)) +
+ ggplot(Fatalities, aes(x=service, y=income, fill=breath)) +
   geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~breath)
 
+ ggplot(data, aes(x=x, y=y, fill=fill)) +
+  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~fill)
 ggplot(data=Fatalities, aes(income)) +                     #for histograms - write function
 
 
