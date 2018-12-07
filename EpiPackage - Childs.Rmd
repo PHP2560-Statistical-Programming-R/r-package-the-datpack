@@ -24,18 +24,19 @@ library(AER)
 data("Fatalities")
 
 #if comments for when people don't read instructions
+test<-Fatalities[complete.cases(Fatalities),]
+test1<-na.omit(Fatalities)
 ```
 
 ```{r}
-test<-Fatalities[complete.cases(Fatalities),]
-test1<-na.omit(Fatalities)
+#barplot
 ggplot(data=test, aes(x=jail, y=breath)) + geom_bar(stat="identity")
 
 ```
 
 
 ```{r}
-#boxplots
+#boxplot
 epi.box<-function(x,y, data, title, xlab, ylab){  #OR epi.box<-function(data, x,y, title, xlab, ylab){
   boxplot(y~x, data=data, notch=TRUE,
   main=title, xlab=xlab, ylab=ylab)
@@ -44,33 +45,19 @@ epi.box(Fatalities$jail, Fatalities$income, data=Fatalities, title="main1", xlab
 ```
 
 ```{r}
-#using plotly
+#PLOTLY
+#sideways hist
+plot_ly(Fatalities, y = ~income, color = I("black"), alpha = 0.1, boxpoints = "suspectedoutliers")
+#boxplot with scatter
+plot_ly(y = ~Fatalities$income, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) #%>%
 
-#plot_ly(Fatalities, y = ~income, color = I("black")), 
-            # alpha = 0.1, boxpoints = "suspectedoutliers")
-p <- plot_ly(y = ~Fatalities$income, type = "box", boxpoints = "all", jitter = 0.3,
-        pointpos = -1.8) #%>%
-
-
-  #add_trace(y = ~Fatalities$income)
-p
-
+#grouped hist
 plot_ly(Fatalities,x=~breath, y = ~income, color=~jail, type = "box", boxpoints = "all", jitter = 0.3,
         pointpos = -1.8) %>%
   layout(boxmode = "group")
 ```
 
-```{r}
-epi.hist<-function(x,y, data, main, xlab, ylab, notch=TRUE ){
-  boxplot(x~y, data=data, notch=notch,
-  main="main", xlab="xlab", ylab="ylab")
-} 
 
-epi.box(Fatalities$income, Fatalities$jail, data=Fatalities)
-
-
-epi.dens<-
-```
 
 ```{r}
   
@@ -80,83 +67,35 @@ plot_ly(Fatalities, x = ~income, type = "histogram")
 
 plot_ly(Fatalities) %>% add_histogram(name = "Income")
 
-price_hist <- function(method = "FD") {
-  h <- hist(diamonds$price, breaks = method, plot = FALSE)
-  plot_ly(x = h$mids, y = h$counts) %>% add_bars(name = method)
-}
+#price_hist <- function(method = "FD") {
+  #h <- hist(diamonds$price, breaks = method, plot = FALSE)
+  #plot_ly(x = h$mids, y = h$counts) %>% add_bars(name = method)
+#}
 
-
+#histogram
 plot_ly(Fatalities, x = ~breath, color = ~jail) %>%
   add_histogram()
-
-  
 ```
 
 ```{r}  
+#HISTOGRAM
+#histogram with line
 ggplot(data=Fatalities, aes(Fatalities$income)) + 
   geom_histogram(aes(y =..density..), 
                  col="blue", 
-                 fill="grey", 
-                 alpha=.2) + 
-  geom_density(col=2) + 
-  labs(title="Histogram for Age", x="Age", y="Count")
-  
-  
-  #make a 2x2**********************
-blue
-```
-
-```{r}
-
-#epi.2by2
-
-dat <- matrix(c(13,2163,5,3349), nrow = 2, byrow = TRUE)
-rownames(dat) <- c("DF+", "DF-"); colnames(dat) <- c("FUS+", "FUS-"); dat
-
-epi.2by2(dat = as.table(dat), method = "cross.sectional", 
-   conf.level = 0.95, units = 100,  homogeneity = "breslow.day", 
-   outcome = "as.columns")
-
-```
-
-
-```{r}
-
-ggplot(data=Fatalities, aes(Fatalities$income)) + 
-  geom_histogram(aes(y =..density..), 
-                 col="blue", 
-                 fill="grey", 
-                 alpha=.2) + 
+                 fill="light blue", 
+                 alpha=.5) + 
   geom_density(col=2) + 
   labs(title="Histogram for Age", x="Age", y="Count")
 
-
-#library(ggplot2)
+#histogram w/o line
+library(ggplot2)
 ggplot(data=Fatalities, aes(income)) + 
   geom_histogram(col="black",
                  aes(fill=..count..)) +
-  scale_fill_gradient("Count", low="light blue", high="navy")+ geom_density() + 
+  scale_fill_gradient("Count", low="light blue", high="navy")+
   labs(title="Histogram for Age", x="Age", y="Count")
-  
-
 ```
-
-
-```{r}
-#scatterplots
-#ggplot2
-
-
-
-
-
-#plotly
-
-```
-
-
-  
-
 
 
 ```{r}
@@ -167,55 +106,68 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
   data[complete.cases(data), ]
   if(graph == "bar"){                           #boxplot function
   table1 = table(data$x)  ## get the cross tab
-  barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
+  pic<-barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
+  return(pic)
   #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
 } else if(graph=="bargroup"){
-  ggplot(data, aes(fill=fill, y=y, x=x)) +
-  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~jail)
+  pic<-ggplot(data, aes(fill=fill, y=y, x=x)) +
+  geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~fill)
+  return(pic)
 } else if(graph=="barstack"){
-  ggplot(data, aes(fill=fill, y=y, x=x)) +
-    geom_bar( stat="identity")
+  pic<-ggplot(data, aes(fill=fill, y=y, x=x)) +
+  geom_bar( stat="identity")
+  return(pic)
 } else if(graph=="boxplot"){                           #add code for dot plots
-  boxplot(x~y, data=data, notch=TRUE,
+  pic<-boxplot(x~y, data=data, notch=TRUE,
   main="title", xlab="xlab", ylab="ylab")
+  return(pic)
 } else if(graph=="hist"){
-  ggplot(data=data, aes(x)) +                     #for histograms - write function
+  pic<-ggplot(data=data, aes(x)) +                     #for histograms - write function
   geom_histogram(col="black", aes(fill=..count..)) +
-  scale_fill_gradient("Count", low="light blue", high="navy")
+  scale_fill_gradient("Count", low="light blue", high="navy")+
   labs(title="title", x="xlab", y="ylab")
+  return(pic)
 } else if(graph=="histcurve"){                      
-  ggplot(data=data, aes(x)) +                     #for histograms - write function
-  geom_histogram(col="black", aes(fill=..count..)) +
-  scale_fill_gradient("Count", low="light blue", high="navy")+ 
-  geom_density() + 
+   pic<-ggplot(data=data, aes(x)) + 
+  geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
+  geom_density(col=2) + 
   labs(title="title", x="xlab", y="ylab")
+  return(pic)
 } else if(graph=="scatter"){
-  pic=ggplot(data, aes(x, y, color = fill)) +
+  pic<-ggplot(data, aes(x, y, color = fill)) +
   geom_point(shape = 16, size = 5, show.legend = TRUE) +
   theme_minimal() +
-  scale_color_gradient(color = "Blues")+
+  #scale_color_gradient(color = "Blues")+
   labs(title="title", x="xlab", y="ylab", color = "legend")
+  return(pic)
 } else if(graph=="scatterline"){
-  ggplot(data, aes(x, y, color = fill)) +
+  pic<-ggplot(data, aes(x, y, color = fill)) +
   geom_point(shape = 16, size = 5, show.legend = TRUE) +
   theme_minimal() +
   scale_color_gradient(low = "light blue", high = "dark blue")+
   labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
+  return(pic)
 } else if(graph=="linreg"){
-  ggplot(data, aes(x, y, color = fill)) +
+  pic<-ggplot(data, aes(x, y, color = fill)) +
   geom_point(shape = 16, size = 5, show.legend = TRUE) +
   theme_minimal() +
   scale_color_gradient(low = "light blue", high = "dark blue")+
   labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
-} 
   return(pic)
+} 
 }
 
-data1.1<-  Fatalities[complete.cases(Fatalities), ]
+epiplot(Fatalities, Fatalities$income, graph = "histcurve")
 
+
+
+ggplot(data=Fatalities, aes(income)) +                     #for histograms - write function
+
+
+Fatalities, aes(income, fatal, color = drinkage)
 
 pic = graph & return(pic within each step - change colors to continuous scale
-epiplot(data = data1.1, x=breath,graph = "bar")
+epiplot(data = test, x=test$jail ,graph = "bar")
 
 class(data1.1$breath)
 xlim(Fatalities$breath)
@@ -225,13 +177,18 @@ lims(Fatalities$breath)
 
 ggplot(data=data1.1, aes(x=jail, y=drinkage)) +geom_bar(stat="identity")+facet_wrap(data1.1$jail)
 
-table1 = table(data$x)  ## get the cross tab
-barplot(table1, beside = TRUE, legend = levels(data$x)) 
 
-table1 = table(Fatalities$breath)  ## get the cross tab
-barplot(table1, beside = TRUE, legend = levels(Fatalities$breath)) 
+```
 
-barplot.default(table(data1.1$jail), col = c("lightblue", "darkblue"), main = "title", xlab = "xlab", ylab = "ylab")
+```{r}
+
+#table1 = table(data$x)  ## get the cross tab
+#barplot(table1, beside = TRUE, legend = levels(data$x)) 
+
+#table1 = table(Fatalities$breath)  ## get the cross tab
+#barplot(table1, beside = TRUE, legend = levels(Fatalities$breath)) 
+
+#barplot.default(table(data1.1$jail), col = c("lightblue", "darkblue"), main = "title", xlab = "xlab", ylab = "ylab")
   #else if(graph=kaplan){                        #survival
 #}
  # print a function with parmfrow
@@ -241,6 +198,7 @@ barplot.default(table(data1.1$jail), col = c("lightblue", "darkblue"), main = "t
   #scale_color_gradient(low = "light blue", high = "dark blue")+
   #labs(title="title", x="xlab", y="ylab", color = "Drinks")+geom_smooth(method = 'lm', se = TRUE)
 ````
+
 
 ```{r}
 #test
@@ -383,5 +341,17 @@ use wcgs to test
   
 
 epi.2by2
+
+```
+```{r}
+#epi.2by2
+#run all calculation and then use broom to clean up neatly
+
+dat <- matrix(c(13,2163,5,3349), nrow = 2, byrow = TRUE)
+rownames(dat) <- c("DF+", "DF-"); colnames(dat) <- c("FUS+", "FUS-"); dat
+
+epi.2by2(dat = as.table(dat), method = "cross.sectional", 
+   conf.level = 0.95, units = 100,  homogeneity = "breslow.day", 
+   outcome = "as.columns")
 
 ```
