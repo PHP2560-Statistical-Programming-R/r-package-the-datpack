@@ -102,8 +102,7 @@ map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="state"
 ```
 
 
-
-#Working ggmap graph
+#Working ggmap graph: Cleaning the state variable data 
 ```{r}
 us_map <- map_data("state")
 
@@ -117,24 +116,26 @@ state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(s
 tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
   rename(id = state_full)
 
-Fatalities %>%
-  left_join(state_abbs, by = c("state" = "abb")) %>%
-  right_join(us_map, by = c("state_full" = "region")) %>%
+Fatalities_clean <- Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb"))
+  #right_join(us_map, by = c("state_full" = "region"))
+
+Fatalities_clean %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `fatal`)) +
   geom_polygon(color = "white") + ggtitle("National Fatalities 1982-1988") +
   theme_void() + 
   scale_fill_viridis(name = "Fatalities (Count)") 
 ```
-
-
+Note: must specify in the vignette that the state variable must be the full name in all lowercase and called "state_full". The function we created will merge the state_full variable with the us maps dataset.
 
 #National Prevalence Function (Working)
 ```{r}
 map_national_prevalence <- function(data,existing_cases,population,state,year) {
+us_map <- map_data("state")
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
   geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
@@ -142,7 +143,7 @@ map_national_prevalence <- function(data,existing_cases,population,state,year) {
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_national_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+map_national_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
 #Mapping for Region: Northeast (Working)
@@ -228,19 +229,20 @@ map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="
 
 #Mapping for Region All one Function (Not working)
 ```{r}
+geographic_region<- vector("Northeast","South","Midwest","West")
+
 map_region_prevalence <- function(data,existing_cases,population,state,year,geographic_region) {
+geographic_region<- vector("Northeast","South","Midwest","West") 
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
-    mutate(prevalence = !! sym(existing_cases) / !!sym(population),  
-           geographic_region = c("Northeast", "South", "Midwest", "West")) %>%
-    
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%  
   left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
     if (geographic_region == "Northeast") {
 map_northeast_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    } else if (geographic_region =="South") {
+    } else if (geographic_region == "South") {
       map_south_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    } else if (geographic_region =="Midwest") {
+    } else if (geographic_region == "Midwest") {
       map_midwest_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
     } else {
       map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
