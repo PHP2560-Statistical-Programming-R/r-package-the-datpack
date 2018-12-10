@@ -48,62 +48,9 @@ library(viridis)
 library(AER)
 data(Fatalities)
 ```
+NOTE: no data for Alaska or Hawaii
 
-#Map of Northeast
-```{r}
-plot_usmap(data = Fatalities, values = "fatal", include =c("MA","RI","CT","ME","VT","NH","NY","NJ","PA"), lines = "black") + 
-  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::comma) + labs(title = "Northeast US States") + theme(legend.position = "right")
-```
-The Northeast includes Maine, New Hampshire, Vermont, Massachusetts, Rhode Island, Connecticut, New York, New Jersey, and Pennsylvania
-
-#Map of South 
-```{r}
-plot_usmap(data = Fatalities, values = "fatal", include =c("DE","MD","WV","VA","KY","TN","NC","SC","GA","AL","MS","AR","LA","FL","TX","OK"), lines = "black") + scale_fill_continuous(low = "white", high = "dark green", name = "fatalities", label = scales::comma) + labs(title = "Southern US States") + theme(legend.position = "right")
-```
-The South claims more states than any other region: Delaware, Maryland, Virginia, West Virginia, Kentucky, North Carolina, South Carolina, Tennessee, Georgia, Florida, Alabama, Mississippi, Arkansas, Louisiana, Texas, and Oklahoma.
-
-#Map of Midwest
-```{r}
-plot_usmap(data = Fatalities, values = "fatal", include =c("OH","MI","IN","WI","IL","MN","IA","MO","ND","SD","NE","KS"), lines = "black") + 
-  scale_fill_continuous(low = "white", high = "pink", name = "fatalities", label = scales::comma
-  ) + labs(title = "Midwest US States") + theme(legend.position = "right")
-```
-The Midwest consists of Ohio, Michigan, Indiana, Wisconsin, Illinois, Minnesota, Iowa, Missouri, North Dakota, South Dakota, Nebraska, and Kansas.
-
-#Map of West Coast
-```{r}
-plot_usmap(data = Fatalities, values = "fatal", include = c("MT","WY","CO","NM","AZ","UT","CA", "ID", "NV", "OR", "WA"), lines = "black") + 
-  scale_fill_continuous(low = "white", high = "sky blue", name = "Fatalities", label = scales::comma) + 
-  labs(title = "Western US States") + theme(legend.position = "right")
-```
-The West comprises Montana, Idaho, Wyoming, Colorado, New Mexico, Arizona, Utah, Nevada, California, Oregon, Washington, Alaska, and Hawaii.
-
-##NOTE: no data for Alaska or Hawaii
-
-To do: 
-Write function for mapping (state, national)
-within the function, have it first calculate incidence/prevalence, etc. from a predefined previous function
-
-
-#Alternative (No if loop for state) Good one
-```{r}
-map_prevalence <- function(data,existing_cases,population,state,year) {
-  
-  data %>%
-    group_by(!! sym(state), !! sym(year)) %>%
-    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
- plot_usmap(data = Fatalities, values = prevalence, include = state, lines = "black") + 
-  scale_fill_continuous(low = "white", high = "dark blue", name = "fatalities", label = scales::csomma) + labs(title = "State") + theme(legend.position = "right")
-}
-
-map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="al",year="1982")
-
-map_prevalence(Fatalities,existing_cases= "fatal",population="pop",state="state",year="year")
-```
-
-
-
-#Working ggmap graph
+#Cleaning the state variable data 
 ```{r}
 us_map <- map_data("state")
 
@@ -117,24 +64,26 @@ state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(s
 tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
   rename(id = state_full)
 
-Fatalities %>%
-  left_join(state_abbs, by = c("state" = "abb")) %>%
-  right_join(us_map, by = c("state_full" = "region")) %>%
+Fatalities_clean <- Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb"))
+  #right_join(us_map, by = c("state_full" = "region"))
+
+Fatalities_clean %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `fatal`)) +
   geom_polygon(color = "white") + ggtitle("National Fatalities 1982-1988") +
   theme_void() + 
   scale_fill_viridis(name = "Fatalities (Count)") 
 ```
-
-
+Note: must specify in the vignette that the state variable must be the full name in all lowercase and called "state_full". The function we created will merge the state_full variable with the us maps dataset.
 
 #National Prevalence Function (Working)
 ```{r}
 map_national_prevalence <- function(data,existing_cases,population,state,year) {
+us_map <- map_data("state")
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
   geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
@@ -142,125 +91,151 @@ map_national_prevalence <- function(data,existing_cases,population,state,year) {
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_national_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+map_national_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
 #Mapping for Region: Northeast (Working)
 ```{r}
 map_northeast_prevalence <- function(data,existing_cases,population,state,year) {
-  data %>%
+us_map <- map_data("state")
+    data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
     
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
     
     filter(!! sym(state) %in% c("ma","ri","ct","me","vt","nh","ny","nj","pa")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
-  geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities in the Northeast 1982-1988") +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the Northeast") +
   theme_void() + 
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_northeast_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+map_northeast_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
 #Mapping for Region: South (Working)
 ```{r}
 map_south_prevalence <- function(data,existing_cases,population,state,year) {
+us_map <- map_data("state")  
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
     
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
     
     filter(!! sym(state) %in% c("de","md","wv","va","ky","tn","nc","sc",
                                 "ga","al","ms","ar","la","fl","tx","ok")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
-  geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities in the South 1982-1988") +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the South") + 
   theme_void() + 
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_south_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+map_south_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
 #Map for Region: Midwest (Working)
 ```{r}
 map_midwest_prevalence <- function(data,existing_cases,population,state,year) {
+us_map <- map_data("state")  
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
     
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
     
     filter(!! sym(state) %in% c("oh","mi","in","wi","il","mn","ia","mo","nd","sd","ne","ks")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
-  geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities in the Midwest 1982-1988") +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the Midwest") +
   theme_void() + 
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_midwest_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+map_midwest_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
 #Map for Region: West (Working)
 ```{r}
 map_west_prevalence <- function(data,existing_cases,population,state,year) {
+us_map <- map_data("state")  
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
     
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
     
     filter(!! sym(state) %in% c("mt","wy","co","nm","az","ut","ca", "id", "nv", "or", "wa")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
-  geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities in the West 1982-1988") +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the West") +
   theme_void() + 
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
+map_west_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
 ```
 
-#Mapping for Region All one Function (Not working)
+
+#Region Function (Not Working)
 ```{r}
 map_region_prevalence <- function(data,existing_cases,population,state,year,geographic_region) {
+us_map <- map_data("state")
+
+  geographic_region <- data_frame(Northeast="Northeast",South="South",
+                                 Midwest= "Midwest",West="West")
+  
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
-    mutate(prevalence = !! sym(existing_cases) / !!sym(population),  
-           geographic_region = c("Northeast", "South", "Midwest", "West")) %>%
-    
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+    mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%  
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
-    if (geographic_region == "Northeast") {
-map_northeast_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    } else if (geographic_region =="South") {
-      map_south_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    } else if (geographic_region =="Midwest") {
-      map_midwest_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    } else {
-      map_west_prevalence(Fatalities,existing_cases= "fatal",population="pop", state="state", year="year")
-    }
+    if (geographic_region == "Northeast") {   
+filter(!! sym(state) %in% c("ma","ri","ct","me","vt","nh","ny","nj","pa")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the Northeast") +
+  theme_void() + 
+  scale_fill_viridis(name = "Prevalence")
+} else if (geographic_region == "South") {
+ filter(!! sym(state) %in% c("de","md","wv","va","ky","tn","nc","sc",
+                                "ga","al","ms","ar","la","fl","tx","ok")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the South") +
+  theme_void() + 
+  scale_fill_viridis(name = "Prevalence")
+} else if (geographic_region == "Midwest") {
+    filter(!! sym(state) %in% c("oh","mi","in","wi","il","mn","ia","mo","nd","sd","ne","ks")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the Midwest") +
+  theme_void() + 
+  scale_fill_viridis(name = "Prevalence")
+} else if (geographic_region == "West") {
+    filter(!! sym(state) %in% c("mt","wy","co","nm","az","ut","ca", "id", "nv", "or", "wa")) %>%
+  ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+  geom_polygon(color = "white") + ggtitle("Prevalence in the West") +
+  theme_void() + 
+  scale_fill_viridis(name = "Prevalence")
+} else {
+   break }
 }
 
-map_region_prevalence(Fatalities,existing_cases= "fatal", population="pop", state="state", year="year", geographic_region = "Northeast")
+map_region_prevalence(Fatalities_clean,existing_cases= "fatal", population="pop", state="state", year="year", geographic_region = "Northeast")
 ```
 
 
-#Mapping for Specific Year
+#Mapping for Specific Year (Not Working)
 ```{r}
 map_national_prevalence <- function(data,existing_cases,population,state,year,specific_year) {
+us_map <- map_data("state")  
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
   mutate(prevalence = !! sym(existing_cases) / !!sym(population),
-         specific_year = distinct(!! sym(year))) %>%
-  filter(!! sym(year) == specific_year) %>%
+         specific_year = !! sym(unique(year))) %>%
       
-  left_join(state_abbs, by = c("state" = "abb")) %>%
+  #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state" = "region")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
   geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
@@ -268,8 +243,10 @@ map_national_prevalence <- function(data,existing_cases,population,state,year,sp
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_national_prevalence(Fatalities,existing_cases="fatal",population="pop",state="state",year="year",specific_year == "1982")
+map_national_prevalence(Fatalities_clean,existing_cases="fatal",population="pop",state="state",year="year",specific_year = "1988")
 ```
+
+filter(!! sym(year) == specific_year) %>%
 
 good website: http://rdpeng.github.io/RProgDA/mapping.html 
 
