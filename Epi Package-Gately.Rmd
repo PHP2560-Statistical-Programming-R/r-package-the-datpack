@@ -187,7 +187,7 @@ map_west_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", s
 ```
 
 
-#Region Function (Not Working)
+#Region Function (Not Working: Going to Remove)
 ```{r}
 map_region_prevalence <- function(data,existing_cases,population,state,year,geographic_region) {
 us_map <- map_data("state")
@@ -231,16 +231,6 @@ filter(!! sym(state) %in% c("ma","ri","ct","me","vt","nh","ny","nj","pa")) %>%
 
 map_region_prevalence(Fatalities_clean,existing_cases= "fatal", population="pop", state="state", year="year", geographic_region = "Northeast")
 ```
-
-
-```{r}
-Fatalities_clean %>%
-  group_by(state, year) %>%
-  mutate(prevalence = !! sym(existing_cases) / !!sym(population),
-         specific_year = unique(year)) %>%
-  select(year,specific_year)
-```
-
 
 
 #Mapping for Specific Year (Not Working)
