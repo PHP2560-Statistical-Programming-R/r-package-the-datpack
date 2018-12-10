@@ -3,13 +3,16 @@ title: "Package Vignette"
 output: html_document
 ---
 
+#Data Format
+*The dataset must have information on year and specific state. The state variable must be called "state_full" and have the full name for the state in all lower case letters. Some data cleaning may be needed for the function to run properly. 
+
 #Mapping National Prevalence 
 Function: map_national_prevalence(data,existing_cases,population, state, year)
-data: dataset of choice
-*The dataset must have information on year and specific state. The state variable must be called "state_full". Some data cleaning may be needed for the function to run properly. 
+##Arguments: 
+data: dataset of choice formatted as specified
 existing cases: variable for prevalence calculation 
 population: variable for population estimate
-state: state arugment must be "state"
+state: state arugment must be "state_full"
 year: year argument must be "year"
 
 *Example code: 
