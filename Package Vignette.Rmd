@@ -19,7 +19,16 @@ year: year argument must be "year"
 map_national_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
 
 #Mapping Regional Prevalence
-For user convenience, this package
+##For user convenience, this package uses regional functions to map prevalence. The regions are: Northeast, South, Midwest and West. 
+*Include inforamtion on what states are included in each dataset
+
+Function: map_northeast_prevalence(data,existing_cases,population, state, year)
+###Arguments: 
+data: dataset of choice formatted as specified
+existing cases: variable for prevalence calculation 
+population: variable for population estimate
+state: state arugment must be "state_full"
+year: year argument must be "year"
 
 #Visualizing Data through plots
 ##1. Must have cleaned data with no NAs (Reference link: https://stackoverflow.com/questions/4862178/remove-rows-with-all-or-some-nas-missing-values-in-data-frame )

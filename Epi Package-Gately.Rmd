@@ -175,8 +175,9 @@ us_map <- map_data("state")
   #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state_full" = "region")) %>%
     
-    filter(!! sym(state) %in% c("montana","wyoming","colorado","new mexico", "arizona", 
-                                "utah","california","idaho","nevada","oregon","washington")) %>%
+    filter(!! sym(state) %in% c("montana","wyoming","colorado","new mexico", "arizona",       
+                                "utah","california","idaho","nevada","oregon","washington",
+                                "hawaii","alaska")) %>%
   ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
   geom_polygon(color = "white") + ggtitle("Prevalence in the West") +
   theme_void() + 
@@ -185,7 +186,7 @@ us_map <- map_data("state")
 
 map_west_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state_full", year="year")
 ```
-
+*Note: added code for Hawaii and Alaska even though the dataset we used doesn't have that data
 
 #Region Function (Not Working: Going to Remove)
 ```{r}
