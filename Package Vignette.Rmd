@@ -2,6 +2,18 @@
 title: "Package Vignette"
 output: html_document
 ---
-```{r}
-devtools::use_vignette("my-vignette")
-```
+
+#Mapping National Prevalence 
+Function: map_national_prevalence(data,existing_cases,population, state, year)
+data: dataset of choice
+*The dataset must have information on year and specific state. The state variable must be called "state_full". Some data cleaning may be needed for the function to run properly. 
+existing cases: variable for prevalence calculation 
+population: variable for population estimate
+state: state arugment must be "state"
+year: year argument must be "year"
+
+*Example code: 
+map_national_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
+
+#Mapping Regional Prevalence
+For user convenience, this package
