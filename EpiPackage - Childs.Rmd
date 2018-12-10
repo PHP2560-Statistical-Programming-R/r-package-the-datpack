@@ -168,6 +168,8 @@ epiplot(Fatalities, x=Fatalities$jail, graph = "bar")
 
 epiplot(Fatalities, y=Fatalities$income, graph = "dotboxplot")
 
+###link to complete cases code in stat exchange
+
 class(data1.1$breath)
 xlim(Fatalities$breath)
 lims(Fatalities$breath)
