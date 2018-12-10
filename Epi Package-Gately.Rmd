@@ -184,8 +184,10 @@ map_west_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", s
 ```{r}
 map_region_prevalence <- function(data,existing_cases,population,state,year,geographic_region) {
 us_map <- map_data("state")
+
   geographic_region <- data_frame(Northeast="Northeast",South="South",
-                                  Midwest= "Midwest",West="West")
+                                 Midwest= "Midwest",West="West")
+  
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
     mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%  
@@ -231,8 +233,7 @@ us_map <- map_data("state")
   data %>%
     group_by(!! sym(state), !! sym(year)) %>%
   mutate(prevalence = !! sym(existing_cases) / !!sym(population),
-         specific_year = distinct(year)) %>%
-  filter(!! sym(year) == specific_year) %>%
+         specific_year = !! sym(unique(year))) %>%
       
   #left_join(state_abbs, by = c("state" = "abb")) %>%
   right_join(us_map, by = c("state" = "region")) %>%
@@ -242,8 +243,10 @@ us_map <- map_data("state")
   scale_fill_viridis(name = "Prevalence")
 }
 
-map_national_prevalence(Fatalities_clean,existing_cases="fatal",population="pop",state="state",year="year",specific_year == "1982")
+map_national_prevalence(Fatalities_clean,existing_cases="fatal",population="pop",state="state",year="year",specific_year = "1988")
 ```
+
+filter(!! sym(year) == specific_year) %>%
 
 good website: http://rdpeng.github.io/RProgDA/mapping.html 
 
