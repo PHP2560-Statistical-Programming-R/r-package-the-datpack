@@ -99,6 +99,27 @@ ggplot(data=Fatalities, aes(income)) +
 
 
 ```{r}
+
+##Vignette for epiplot function
+
+#1. Must have cleaned data with no NAs (Reference link: https://stackoverflow.com/questions/4862178/remove-rows-with-all-or-some-nas-missing-values-in-data-frame )
+#2. Arguments: (data, x, y, graph, fill, title, xlab, ylab, legend)
+#3. Graphs: bar plot ("bar"), grouped bar plot ("bargroup"), stacked bar plot ("barstack"), box plot ("boxplot"), box plot with correlating dots ("dotboxplot"), histogram ("hist"), density plot ("densityhist"), scatter plot ("scatter"), scatter plot with correlating line ("scatterline"), linear regression ("linreg").
+#4. Input the correct arguments:
+    #bar plot: (data=data, x=data$x, graph="bar", title="Title of plot", xlab="x-axis label", ylab= "y-axis label")
+    #grouped bar plot: (data=data, x=data$x,y=data$y, graph="bargroup",fill=data$fill, title="Title of plot", xlab="x-axis labellab",  ylab="y-axis label")
+    #stacked bar plot: (data=data, x=data$x,y=data$y, graph="barstack",fill=data$fill, title="Title of plot", xlab="x-axis labellab",  ylab="y-axis label")
+    #box plot: (data=data, x=data$x,y=data$y, graph="boxplot", title="Title of plot", xlab="x-axis label",  ylab="y-axis label")
+    #box plot with correlating dots:(data=data,y=data$y, graph="dotboxplot", title="Title of plot", xlab="x-axis labellab",  ylab="y-axis label")
+    #histogram: (data=data, x=data$x, graph="hist", title="Title of plot", xlab="x-axis label",  ylab="y-axis label")
+    #density plot: (data=data, x=data$x, graph="densityhist", title="Title of plot", xlab="x-axis label",  ylab="y-axis label")
+    #scatter plot: (data=data, x=data$x, y=data$y, graph="scatter",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
+    #scatter plot with correlating line: (data=data, x=data$x, y=data$y, graph="scatterline",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
+    #linear regression: (data=data, x=data$x, y=data$y, graph="linreg",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
+
+```
+
+```{r}
 epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
   data[complete.cases(data), ]
   if(graph == "bar"){                           #boxplot function
@@ -167,6 +188,19 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
 epiplot(Fatalities, x=Fatalities$jail, graph = "bar") 
 
 epiplot(Fatalities, y=Fatalities$income, graph = "dotboxplot")
+
+library(ggplot2)
+ggplot(Fatalities, aes(Fatalities$income, Fatalities$fatal, color = Fatalities$drinkage)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(low = "light blue", high = "dark blue")+
+  labs(title="title", x="xlab", y="ylab", color = "Drinkage")
+
+ggplot(Fatalities, aes(Fatalities$income, Fatalities$fatal, color = Fatalities$drinkage)) +
+  geom_point(shape = 16, size = 5, show.legend = TRUE) +
+  theme_minimal() +
+  scale_color_gradient(low = "light blue", high = "dark blue")+
+  labs(title="title", x="xlab", y="ylab")+geom_smooth()
 
 ###link to complete cases code in stat exchange
 
