@@ -99,13 +99,10 @@ ggplot(data=Fatalities, aes(income)) +
 
 
 ```{r}
-library(ggplot2)
-#write a function with an argument to select plot type - set color scheme to match the maps
-
 epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
   data[complete.cases(data), ]
   if(graph == "bar"){                           #boxplot function
-  pic<-  ggplot(data, aes(x=x, fill=x)) + 
+  pic<-  ggplot(data=data, aes(x=x, fill=x)) + 
   geom_bar( ) +
   scale_fill_brewer(palette = "Paired")+
   labs(title="title", x="xlab", y="ylab")
@@ -114,11 +111,11 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
   return(pic)
   #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
 } else if(graph=="bargroup"){                                           #works, but has column for NAs....why???
-  pic<-ggplot(data, aes(x=x, y=y, fill=fill)) +
+  pic<-ggplot(data=data, aes(x=x, y=y, fill=fill)) +
   geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~"fill")
   return(pic)
 } else if(graph=="barstack"){                                           #works, but has column for NAs....why???
-  pic<-ggplot(data, aes(fill=fill, y=y, x=x)) +
+  pic<-ggplot(data=data, aes(fill=fill, y=y, x=x)) +
   geom_bar( stat="identity")
   return(pic)
 } else if(graph=="boxplot"){                                            #GOOD                 
@@ -167,7 +164,9 @@ epiplot<- function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###ad
 ```
 
 ```{r}
-epiplot(Fatalities, x=Fatalities$service, graph = "bar") 
+epiplot(Fatalities, x=Fatalities$jail, graph = "bar") 
+
+epiplot(Fatalities, y=Fatalities$income, graph = "dotboxplot")
 
 class(data1.1$breath)
 xlim(Fatalities$breath)
