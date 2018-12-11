@@ -6,7 +6,8 @@ output: html_document
 This package provides tools to help visualize epidemiologic data. The mapping functions allow users to visualize the prevalence of their variable of interest at the national and regional levels. The graph functions allow users to plot and visualize their data in many ways?? Mention features. 
 
 #Data Format
-*The dataset must have information on year and specific state. The state variable must be called "state_full" and have the full name for the state in all lower case letters. Some data cleaning may be needed for the function to run properly. 
+*The dataset must have variables for year and specific state. The state variable must be called "state_full" and have the full name of the state in all lower case letters. Some data cleaning may be needed for the function to run properly. Information on data cleaning is available through the link below: 
+https://stackoverflow.com/questions/7531868/how-to-rename-a-single-column-in-a-data-frame
 
 #Mapping National Prevalence 
 ##This function maps national prevalence of a variable of choice across all time points of the dataset. 
