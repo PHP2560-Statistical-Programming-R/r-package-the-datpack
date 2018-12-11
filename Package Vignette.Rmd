@@ -45,6 +45,10 @@ population: variable for population estimate
 state: state arugment must be "state_full"
 year: year argument must be "year"
 
+*Example code: 
+map_national_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop", state="state", year="year")
+
+
 #Visualizing Data through plots
 ##1. Must have cleaned data with no NAs (Reference link: https://stackoverflow.com/questions/4862178/remove-rows-with-all-or-some-nas-missing-values-in-data-frame )
 ##2. Epiplot function arguments: (data, x, y, graph, fill, title, xlab, ylab, legend)
