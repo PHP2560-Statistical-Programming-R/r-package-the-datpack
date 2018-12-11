@@ -20,7 +20,15 @@ map_national_prevalence(Fatalities_clean,existing_cases= "fatal",population="pop
 
 #Mapping Regional Prevalence
 ##For user convenience, this package uses regional functions to map prevalence. The regions are: Northeast, South, Midwest and West. 
-*Include inforamtion on what states are included in each dataset
+
+Northeast includes: Massachusetts, Rhode Island, Connecticut, Maine, Vermont, New Hampshire, New York, New Jersey, and Pennsylvania
+
+South includes: Delaware, Maryland, West Virginia, Virginia, Kentucky, Tennessee, North Carolina, South Carolina, Georgia, Alabama, Mississippi, Arkansas, Louisiana, Florida, Texas, and Oklahoma 
+
+Midwest includes: Ohio, Michigan, Indiana, Wisconsin, Illinois, Minnesota, Iowa, Missouri, North Dakota, South Dakota, Nebraska, and Kansas
+
+South includes: Montana, Wyoming, Colorado, New Mexico, Arizona, Utah, California, Idaho, Nevada, Oregon, Washington, Hawaii, and Alaska
+
 
 Function: map_northeast_prevalence(data,existing_cases,population, state, year)
 ###Arguments: 
