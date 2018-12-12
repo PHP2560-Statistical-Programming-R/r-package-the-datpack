@@ -63,17 +63,15 @@ ui <- pageWithSidebar(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Scatterplots", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
+                tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
                          textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Boxplots", plotOutput("BoxPlot", height = "580px"),
+                tabPanel("Basic Graphing", plotOutput("BoxPlot", height = "580px"),
                          textInput("text_box", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Summary statistics", br(),verbatimTextOutput("lmResults"),
-                         textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Diagnostic plots",  plotOutput("diagnostics", height = "580px"),
-                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Regional Maps",  plotOutput("added", height = "580px"),
+                tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
+                         textInput("text_summary", label = "Interpretation", value = "Enter text...")),
+                tabPanel("National Map",  plotOutput("added", height = "580px"),
                          textInput("text_added", label = "Interpretation", value = "Enter text...")),
-                tabPanel("National Maps",  plotOutput("MMPlot", height = "580px"),
+                tabPanel("Regional Maps",  plotOutput("MMPlot", height = "580px"),
                          textInput("text_mmp", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Help",  htmlOutput("inc"))
                 
@@ -88,7 +86,10 @@ server <- function(input, output) {
 
 shinyApp(ui, server)
 
-
+#Things to Figure out:
+#  1. Upload dataset
+#  2. What tabs to include
+#  3. Functions
 
       
       
