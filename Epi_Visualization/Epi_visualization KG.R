@@ -20,15 +20,19 @@ ui <- pageWithSidebar(
   # App title: Epi Visualization
   headerPanel("Epi Visualization"),
   
+  
   # Sidebar panel for inputs ----
   sidebarPanel(
-  
+    helpText("Create demographic maps and plot with 
+               information from the US Traffic Fatalities Panel Data"),
   # Input: Selector for variable to plot against mpg ----
-  selectInput("variable", "Variable 1:", 
-              c("Fatalities" = "Fatal",
-                "State" = "state_full",
-                "Income" = "income",
-                "Year" = "year")),
+  selectInput("variable", 
+              label = "Choose a variable to display",
+              choices = c("Fatalities" = "Fatal",
+                  "State" = "state_full",
+                 "Income" = "income",
+                  "Year" = "year")),
+             
   sliderInput(inputId = "year",
               label = "Years:",
               min = 1982,
