@@ -41,6 +41,7 @@ library(rprev)
 library(ggmap)
 library(mapdata)
 library(viridis)
+library(EpidemiologyVision)
 ```
 
 #Load sample dataset available in the AER package
@@ -68,11 +69,6 @@ Fatalities_clean <- Fatalities %>%
   left_join(state_abbs, by = c("state" = "abb"))
   #right_join(us_map, by = c("state_full" = "region"))
 
-Fatalities_clean %>%
-  ggplot(aes(x = long, y = lat, group = group, fill = `fatal`)) +
-  geom_polygon(color = "white") + ggtitle("National Fatalities 1982-1988") +
-  theme_void() + 
-  scale_fill_viridis(name = "Fatalities (Count)") 
 ```
 Note: must specify in the vignette that the state variable must be the full name in all lowercase and called "state_full". The function we created will merge the state_full variable with the us maps dataset.
 
