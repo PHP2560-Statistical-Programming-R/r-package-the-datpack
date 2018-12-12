@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(AER)
 
 
 #Making Cleaned dataset into a CSV file
@@ -107,8 +108,90 @@ ui <- pageWithSidebar(
                 )
     )
   )
-
+library(shiny)
+library(ggplot2)
+library(AER)
 server <- function(input, output) {
+  ArgNames <- reactive({
+    Names <- names(formals("read.csv")[-1])
+    Names <- Names[Names!="..."]
+    return(Names)
+  })
+  
+  ### Data import:
+  Dataset <- reactive({
+    
+    # User has not uploaded a file yet
+    if (is.null(input$file) && input$myLoader==0) {
+      return(data.frame())
+    }
+    
+    #loading test dataset
+    if (input$myLoader && is.null(input$file)){
+      return(Fatalities_clean)
+    }
+    
+    #loading csv. when data has been uploaded
+    
+    args <- grep(paste0("^","read.csv","__"), names(input), value = TRUE)
+    
+    argList <- list()
+    for (i in seq_along(args))
+    {
+      argList[[i]] <- eval(parse(text=input[[args[i]]]))
+    }
+    names(argList) <- gsub(paste0("^","read.csv","__"),"",args)
+    
+    argList <- argList[names(argList) %in% ArgNames()]
+    
+    Dataset <- as.data.frame(do.call("read.csv",c(list(input$file$datapath),argList)))
+    return(Dataset)
+  })
+  
+  
+  # Select variables part 1:
+  output$varselect_num <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    # Independent Numeric Variable selection:    
+    selectInput("varnum", "Explantory Variables (Numeric):",
+                names(Dataset()), multiple =TRUE)
+  })
+  
+  # Select variables part 2:
+  output$varselect_cat <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    # Independent Categorical Variable selection:    
+    selectInput("varcat", "Explantory Variables (Categorical):",
+                names(Dataset()), multiple =TRUE)
+  })
+  
+  # Select variables part 3:
+  output$outcomeselect <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    # Dependent Variable selection:
+    selectInput("outcome","Outcome Variable:",
+                names(Dataset()), names(Dataset()))
+  })
+  
+  # Dataset Name:
+  output$datasetnameout <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    if (input$myLoader && is.null(input$file)){
+      textInput("datasetame", "Name of dataset", value = "birthwt")
+    }
+    else if (is.null(input$file)==FALSE){
+      textInput("datasetame", "Name of dataset", value = "Enter text...")
+    }
+  })
+  
   
 }
 
