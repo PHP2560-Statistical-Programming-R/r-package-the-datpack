@@ -8,12 +8,35 @@
 #
 
 library(shiny)
+library(MASS)
+library(epiR)
+library(epitools)
+library(incidence)
+library(AER)
+library(epiDisplay)
+library(devtools)
+library(roxygen2)
+library(epicalc)
+library(maps)
+library(usmap)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(rprev)
+library(ggmap)
+library(mapdata)
+library(viridis)
+
 
 
 #Making Cleaned dataset into a CSV file
 exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=",",row.names=F)
 
 test_dataset_fatalities <- read.csv("Fatalities_clean.csv", stringsAsFactors = FALSE)
+
+saveRDS(object, file = "Fatalities_clean.csv", ascii = FALSE, version = NULL,
+        compress = TRUE, refhook = NULL)
+readRDS("Fatalities_clean.csv", refhook = NULL)
 
 ui <- pageWithSidebar(
   
@@ -80,7 +103,18 @@ tags$head(
   )
 
 server <- function(input, output) {
-
+  output$map <- renderPlot({
+    args <- switch(input$var,
+                   "Fatalities" = list(Fatalities_clean$fatal, "darkgreen", "Fatalities"),
+                   "Year" = list(Fatalities_clean$year, "black", "Year"),
+                   "Population" = list(Fatalities_clean$pop, "darkorange", "Population"),
+                   "Income" = list(Fatalities_clean$income, "darkviolet", "Income"))
+    
+    args$min <- input$range[1]
+    args$max <- input$range[2]
+    
+    do.call(percent_map, args)
+  })
 }
   
 
