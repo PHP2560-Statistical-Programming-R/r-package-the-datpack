@@ -24,7 +24,7 @@ ui <- pageWithSidebar(
   sidebarPanel(
   
   # Input: Selector for variable to plot against mpg ----
-  selectInput("variable", "Variable:", 
+  selectInput("variable", "Variable 1:", 
               c("Fatalities" = "Fatal",
                 "State" = "state_full",
                 "Income" = "income",
@@ -41,11 +41,12 @@ ui <- pageWithSidebar(
 ),
   
   # Main panel for displaying outputs ----
-  mainPanel()
+  mainPanel(
+    h4("This app provides tools to help visualize epidemiologic data"),
+    h5("The mapping functions allow users to visualize the prevalence of their variable of interest at the national and regional levels. 
+       The graph functions allow users to plot and visualize their data in many ways?? Mention features.")
+  )
 )
-
-dataset<-Fatalities_clean
-
 server <- function(input, output) {
 
 }
