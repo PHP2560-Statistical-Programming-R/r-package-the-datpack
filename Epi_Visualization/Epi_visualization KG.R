@@ -46,7 +46,7 @@ tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
 Fatalities_clean <- Fatalities %>%
   left_join(state_abbs, by = c("state" = "abb"))
 
-
+#Building the App
 ui <- pageWithSidebar(
   
   # App title: Epi Visualization
