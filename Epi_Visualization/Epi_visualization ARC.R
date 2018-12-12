@@ -48,9 +48,37 @@ ui <- pageWithSidebar(
     actionButton("myLoader", "Load test dataset",  
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
     
+    #add block between each part
+    hr(),
     
+    # Variable selection:
+    #Independent Numeric variable selection:
+    htmlOutput("varselect_num"),
     
-    ),
+    #Independent Categorical variable selection:
+    htmlOutput("varselect_cat"),
+    
+    #Dependent variable selection:
+    htmlOutput("outcomeselect"),
+    
+    #Because next part is the download file part, so we add a line to block between variable selection and 
+    #file download
+    
+    hr(),
+    
+    #Name of dataset
+    
+    htmlOutput("datasetnameout"),
+    
+    #Name on report
+    textInput("name", "Author name", value = "Name"),
+    
+    #Radio buttons for choosing format
+    radioButtons('format', "Document format", c('PDF', 'HTML', 'Word'), inline = TRUE),
+    
+    #Download button
+    downloadButton('downloadReport')
+    , width=3),
     
   
   
