@@ -19,8 +19,7 @@ ui <- pageWithSidebar(
   
   # App title: Epi Visualization
   headerPanel("Epi Visualization"),
-  
-  
+
   # Sidebar panel for inputs ----
   sidebarPanel(
     helpText("Create demographic maps and plot with 
@@ -51,8 +50,9 @@ ui <- pageWithSidebar(
        The graph functions allow users to plot and visualize their data in many ways?? Mention features.")
   )
 )
-server <- function(input, output) {
 
+server <- function(input, output) {
+ 
 }
   
 
