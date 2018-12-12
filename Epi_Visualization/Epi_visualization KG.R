@@ -25,13 +25,23 @@ ui <- pageWithSidebar(
     helpText("Create demographic maps and plot with 
                information from the US Traffic Fatalities Panel Data"),
   # Input: Selector for variable to plot against mpg ----
-  selectInput("variable", 
+  selectInput("variable 1", 
               label = "Choose a variable to display",
               choices = c("Fatalities" = "Fatal",
                   "State" = "state_full",
                  "Income" = "income",
                   "Year" = "year")),
-             
+  selectInput("variable 1", "Choose a variable to display", 
+              choices = c("None" = "NA", "Fatalities" = "Fatal",
+                "State" = "state_full",
+                "Income" = "income",
+                "Year" = "year")),
+  selectInput("variable 3", "Choose a variable to display", 
+              choices = c("None" = "NA","Fatalities" = "Fatal",
+                "State" = "state_full",
+                "Income" = "income",
+                "Year" = "year")),
+          
   sliderInput(inputId = "year",
               label = "Years:",
               min = 1982,
@@ -42,14 +52,14 @@ ui <- pageWithSidebar(
   checkboxInput("outliers", "Show outliers", TRUE)
   
 ),
-  
+
   # Main panel for displaying outputs ----
   mainPanel(
     h4("This app provides tools to help visualize epidemiologic data"),
     h5("The mapping functions allow users to visualize the prevalence of their variable of interest at the national and regional levels. 
        The graph functions allow users to plot and visualize their data in many ways?? Mention features.")
   )
-)
+) 
 
 server <- function(input, output) {
  
@@ -59,12 +69,6 @@ server <- function(input, output) {
 shinyApp(ui, server)
 
 
-
-
-
-#ui <- fluidPage() (basic structure of the app)
-#server <- function(input, output) {}
-#shinyApp(ui = ui, server = server)
 
       
       
