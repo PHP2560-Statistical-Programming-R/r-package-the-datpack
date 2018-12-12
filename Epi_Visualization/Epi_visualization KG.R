@@ -32,7 +32,19 @@ library(viridis)
 #Making Cleaned dataset into a CSV file
 exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=",",row.names=F)
 
-test_dataset_fatalities <- read.csv("Fatalities_clean.csv", stringsAsFactors = FALSE)
+#Cleaning the Fatalities Dataset
+tbl <- state.x77 %>%
+  as_tibble(rownames = "state") %>%
+  bind_cols(state_name = str_to_lower(state.abb)) %>%
+  rename(value_x = Income) %>%
+  select(state_name, value_x)
+
+state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
+tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
+  rename(id = state_full)
+
+Fatalities_clean <- Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb"))
 
 
 ui <- pageWithSidebar(
