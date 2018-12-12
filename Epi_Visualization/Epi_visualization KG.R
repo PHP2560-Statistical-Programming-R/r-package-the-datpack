@@ -54,33 +54,33 @@ ui <- pageWithSidebar(
 ),
 
   # Main panel for displaying outputs ----
-  mainPanel(
+mainPanel(
     h4("This app provides tools to help visualize epidemiologic data"),
     h5("The mapping functions allow users to visualize the prevalence of their variable of 
         interest at the national and regional levels. The graph functions allow users to plot 
         and visualize their data in many ways?? Mention features."),
-    tags$head(
-      tags$style(type='text/css', 
+tags$head(
+    tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
-                         textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Basic Graphing", plotOutput("BoxPlot", height = "580px"),
-                         textInput("text_box", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
-                         textInput("text_summary", label = "Interpretation", value = "Enter text...")),
-                tabPanel("National Map",  plotOutput("added", height = "580px"),
-                         textInput("text_added", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Regional Maps",  plotOutput("MMPlot", height = "580px"),
-                         textInput("text_mmp", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Help",  htmlOutput("inc"))
-                
+        tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", 
+                                                         height = "580px"),
+              textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
+        tabPanel("Basic Graphing", plotOutput("BoxPlot", height = "580px"),
+              textInput("text_box", label = "Interpretation", value = "Enter text...")),
+        tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
+              textInput("text_summary", label = "Interpretation", value = "Enter text...")),
+        tabPanel("National Map",  plotOutput("added", height = "580px"),
+              textInput("text_added", label = "Interpretation", value = "Enter text...")),
+        tabPanel("Regional Maps",  plotOutput("MMPlot", height = "580px"),
+              textInput("text_mmp", label = "Interpretation", value = "Enter text...")),
+        tabPanel("Help",  htmlOutput("inc"))
     )
   )
   )
 
 server <- function(input, output) {
- 
+
 }
   
 
