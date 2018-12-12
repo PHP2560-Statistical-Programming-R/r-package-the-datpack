@@ -34,9 +34,6 @@ exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=","
 
 test_dataset_fatalities <- read.csv("Fatalities_clean.csv", stringsAsFactors = FALSE)
 
-saveRDS(object, file = "Fatalities_clean.csv", ascii = FALSE, version = NULL,
-        compress = TRUE, refhook = NULL)
-readRDS("Fatalities_clean.csv", refhook = NULL)
 
 ui <- pageWithSidebar(
   
@@ -72,7 +69,6 @@ ui <- pageWithSidebar(
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     ),
   
-  
   # Main panel for displaying outputs ----
 mainPanel(
     h4("This app provides tools to help visualize epidemiologic data"),
@@ -99,7 +95,43 @@ mainPanel(
   )
 
 server <- function(input, output) {
+  ##Argument names:
+  #Using the header names from the data 
+  ArgNames <- reactive({
+    Names <- names(formals("read.csv")[-1])
+    Names <- Names[Names!="..."]
+    return(Names)
+  })
   
+  ### Data import:
+  Dataset <- reactive({
+    
+    # User has not uploaded a file yet
+    if (is.null(input$file) && input$myLoader==0) {
+      return(data.frame())
+    }
+    
+    #loading test dataset
+    if (input$myLoader && is.null(input$file)){
+      return("Fatalities_clean.csv")
+    }
+    
+    #loading csv. when data has been uploaded
+    
+    args <- grep(paste0("^","read.csv","__"), names(input), value = TRUE)
+    
+    argList <- list()
+    for (i in seq_along(args))
+    {
+      argList[[i]] <- eval(parse(text=input[[args[i]]]))
+    }
+    names(argList) <- gsub(paste0("^","read.csv","__"),"",args)
+    
+    argList <- argList[names(argList) %in% ArgNames()]
+    
+    Dataset <- as.data.frame(do.call("read.csv",c(list(input$file$datapath),argList)))
+    return(Dataset)
+  })
 }
 
 
