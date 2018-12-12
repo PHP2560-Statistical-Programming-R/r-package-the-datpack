@@ -16,11 +16,8 @@ Our plan:
   
   2.a. functions to provide summary statistic visualizations (box plots, histograms, bar plots) - Arielle
  
-  2.b. create a map function (state, maybe city, maybe zip) - incorporate time as an argument - Gracie & Katie
-    
-    2.b.1. within the function, calculate statistic (incidence, prevalence, etc...) using existing packages before mapping
-    
-    2.b.2. use density
+  2.b. create a map function (national,regional) for prevalence (5 functions in total) - Gracie & Katie
+   
 
   
 
