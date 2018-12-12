@@ -39,9 +39,20 @@ ui <- pageWithSidebar(
                 value = 1),
     
     # Input: Checkbox for whether outliers should be included ----
-    checkboxInput("outliers", "Show outliers", TRUE)
+    checkboxInput("outliers", "Show outliers", TRUE),
+    
+    fileInput("file", "Upload csv data-file:"),
+    
+    #Using action buttoms to load sample dataset
+    #change the color of the buttom to contrast with previous blank
+    actionButton("myLoader", "Load test dataset",  
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+    
+    
     
     ),
+    
+  
   
   # Main panel for displaying outputs ----
   mainPanel(
