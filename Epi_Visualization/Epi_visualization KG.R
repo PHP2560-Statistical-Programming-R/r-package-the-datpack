@@ -56,6 +56,7 @@ ui <- pageWithSidebar(
   sidebarPanel(
     helpText("Create demographic maps and plot with 
              information from the US Traffic Fatalities Panel Data"),
+    
     # Input: Selector for variable to plot against mpg ----
     selectInput("variable 1", 
                 label = "Choose a variable to display",
@@ -91,15 +92,45 @@ ui <- pageWithSidebar(
     #Using action buttoms to load sample dataset
     #change the color of the buttom to contrast with previous blank
     actionButton("myLoader", "Load test dataset",  
-                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
-    ),
+                 style="color: #fff; background-color: #337ab7; 
+                 border-color: #2e6da4"),
+    #add block between each part
+    hr(),
+    
+    # Variable selection:
+    #Independent Numeric variable selection:
+    htmlOutput("varselect_num"),
+    
+    #Independent Categorical variable selection:
+    htmlOutput("varselect_cat"),
+    
+    #Dependent variable selection:
+    htmlOutput("outcomeselect"),
+    
+    #Because next part is the download file part, so we add a line to block between variable selection and 
+    #file download
+    
+    hr(),
+    #Name of dataset
+    
+    htmlOutput("datasetnameout"),
+    
+    #Name on report
+    textInput("name", "Author name", value = "Name"),
+    
+    #Radio buttons for choosing format
+    radioButtons('format', "Document format", c('PDF', 'HTML', 'Word'), inline = TRUE),
+    
+    #Download button
+    downloadButton('downloadReport')
+    , width=3),
   
   # Main panel for displaying outputs ----
 mainPanel(
     h4("This app provides tools to help visualize epidemiologic data"),
     h5("The mapping functions allow users to visualize the prevalence of their variable 
         of interest at the national and regional levels. The graph functions allow users 
-        to plot and visualize their data in many ways?? Mention features."), 
+        to plot and visualize their data in many ways."), 
   tags$head(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
@@ -120,8 +151,6 @@ mainPanel(
   )
 
 server <- function(input, output) {
-  ##Argument names:
-  #Using the header names from the data 
   ArgNames <- reactive({
     Names <- names(formals("read.csv")[-1])
     Names <- Names[Names!="..."]
@@ -138,7 +167,7 @@ server <- function(input, output) {
     
     #loading test dataset
     if (input$myLoader && is.null(input$file)){
-      return("Fatalities_clean.csv")
+      return(Fatalities_clean)
     }
     
     #loading csv. when data has been uploaded
@@ -157,14 +186,72 @@ server <- function(input, output) {
     Dataset <- as.data.frame(do.call("read.csv",c(list(input$file$datapath),argList)))
     return(Dataset)
   })
+  
+  
+  # Select variables part 1:
+  output$varselect_num <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    # Independent Numeric Variable selection:    
+    selectInput("varnum", "Explantory Variables (Numeric):",
+                names(Dataset()), multiple =TRUE)
+  })
+  
+  # Select variables part 2:
+  output$varselect_cat <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    # Independent Categorical Variable selection:    
+    selectInput("varcat", "Explantory Variables (Categorical):",
+                names(Dataset()), multiple =TRUE)
+  })
+  
+  # Select variables part 3:
+  output$outcomeselect <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    # Dependent Variable selection:
+    selectInput("outcome","Outcome Variable:",
+                names(Dataset()), names(Dataset()))
+  })
+  
+  # Dataset Name:
+  output$datasetnameout <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    if (input$myLoader && is.null(input$file)){
+      textInput("datasetame", "Name of dataset", value = "birthwt")
+    }
+    else if (is.null(input$file)==FALSE){
+      textInput("datasetame", "Name of dataset", value = "Enter text...")
+    }
+})
+  output$NationalMap<-
+    map_national_prevalence <- function(data,existing_cases,population,state,year) {
+    us_map <- map_data("state")
+    data %>%
+      group_by(!! sym(state), !! sym(year)) %>%
+      mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
+      #left_join(state_abbs, by = c("state" = "abb")) %>%
+      right_join(us_map, by = c("state_full" = "region")) %>%
+      ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
+      geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
+      theme_void() + 
+      scale_fill_viridis(name = "Prevalence")
+    }
 }
-
 
 shinyApp(ui, server)
 
 #Things to Figure out:
 #  1. Upload dataset
 #  2. What tabs to include
+#  3. Output regional map (should we do one for each? or have a way to 
+      #select the region of interest)
 
 
 
