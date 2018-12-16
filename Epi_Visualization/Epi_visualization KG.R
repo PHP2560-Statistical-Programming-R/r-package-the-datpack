@@ -26,7 +26,7 @@ library(rprev)
 library(ggmap)
 library(mapdata)
 library(viridis)
-
+library(shinythemes)
 
 
 #Making Cleaned dataset into a CSV file
@@ -47,45 +47,16 @@ Fatalities_clean <- Fatalities %>%
   left_join(state_abbs, by = c("state" = "abb"))
 
 #Building the App
-ui <- pageWithSidebar(
-  
+ui <-fluidPage(
+  theme = shinytheme("superhero"),          
   # App title: Epi Visualization
   headerPanel("Epi Visualization"),
   
   # Sidebar panel for inputs ----
   sidebarPanel(
-    helpText("Create demographic maps and plot with 
-             information from the US Traffic Fatalities Panel Data"),
-    
-    # Input: Selector for variable to plot against mpg ----
-    selectInput("variable 1", 
-                label = "Choose a variable to display",
-                choices = c("Fatalities" = "Fatal",
-                            "State" = "state_full",
-                            "Income" = "income",
-                            "Year" = "year")),
-    selectInput("variable 2", 
-                label = "Choose a variable to display",
-                choices = c("None" = "None",
-                            "Fatalities" = "Fatal",
-                            "State" = "state_full",
-                            "Income" = "income",
-                            "Year" = "year")),
-    selectInput("variable 3", 
-                label = "Choose a variable to display",
-                choices = c("None" = "None",
-                            "Fatalities" = "Fatal",
-                            "State" = "state_full",
-                            "Income" = "income",
-                            "Year" = "year")),
-    sliderInput(inputId = "year",
-                label = "Years:",
-                min = 1982,
-                max = 1988,
-                value = 1),
-    
-    # Input: Checkbox for whether outliers should be included ----
-    checkboxInput("outliers", "Show outliers", TRUE),
+    helpText("Create demographic maps and plot with information dataset 
+             of choice or from the test dataset: The US Traffic Fatalities 
+             Panel Dataset"),
     
     fileInput("file", "Upload csv data-file:"),
     
@@ -127,11 +98,11 @@ ui <- pageWithSidebar(
   
   # Main panel for displaying outputs ----
 mainPanel(
-    h4("This app provides tools to help visualize epidemiologic data"),
-    h5("The mapping functions allow users to visualize the prevalence of their variable 
-        of interest at the national and regional levels. The graph functions allow users 
-        to plot and visualize their data in many ways."), 
-  tags$head(
+    h5("Welcome to Epi Visualization! This app provides tools to help visualize 
+       epidemiologic data. The graph functions allow users to plot and visualize 
+       their data in many ways. The mapping functions allow users to visualize the 
+       prevalence of their variable of interest at the national and regional levels."), 
+    tags$head(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
   tabsetPanel(type = "tabs", 
@@ -142,9 +113,9 @@ mainPanel(
         tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
               textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
         tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
-              textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+             textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
         tabPanel("Regional Maps",  plotOutput("added", height = "580px"),
-              textInput("text_added", label = "Interpretation", value = "Enter text...")),
+            textInput("text_added", label = "Interpretation", value = "Enter text...")),
         tabPanel("Help",  htmlOutput("inc"))
     )
     )
@@ -230,6 +201,10 @@ server <- function(input, output) {
       textInput("datasetame", "Name of dataset", value = "Enter text...")
     }
 })
+  #Exploratory Data Analysis 
+  #Basic Plots
+  #Epi Tools
+  # National Map
   output$NationalMap<-
     map_national_prevalence <- function(data,existing_cases,population,state,year) {
     us_map <- map_data("state")
@@ -243,14 +218,14 @@ server <- function(input, output) {
       theme_void() + 
       scale_fill_viridis(name = "Prevalence")
     }
+  #Regional Map
 }
 
 shinyApp(ui, server)
 
 #Things to Figure out:
 #  1. Upload dataset
-#  2. What tabs to include
-#  3. Output regional map (should we do one for each? or have a way to 
+#  2. Output regional map (should we do one for each? or have a way to 
       #select the region of interest)
 
 
