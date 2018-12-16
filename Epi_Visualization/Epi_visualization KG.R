@@ -114,8 +114,6 @@ mainPanel(
               textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
         tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
              textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
-        tabPanel("Regional Maps",  plotOutput("added", height = "580px"),
-            textInput("text_added", label = "Interpretation", value = "Enter text...")),
         tabPanel("Help",  htmlOutput("inc"))
     )
     )
@@ -218,7 +216,6 @@ server <- function(input, output) {
       theme_void() + 
       scale_fill_viridis(name = "Prevalence")
     }
-  #Regional Map
 }
 
 shinyApp(ui, server)
