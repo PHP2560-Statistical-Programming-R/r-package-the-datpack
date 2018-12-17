@@ -27,7 +27,7 @@ library(ggmap)
 library(mapdata)
 library(viridis)
 library(shinythemes)
-library(leaflet)
+library(httr)
 
 
 #Making Cleaned dataset into a CSV file
@@ -120,7 +120,8 @@ mainPanel(
   tableOutput(outputId = "Exploratory_Data_Analysis"),
   plotOutput(outputId = "Basic_Plots"),
   tableOutput(outputId = "Epi_Tools"),
-  plotOutput(outputId = "National_Map")
+  plotOutput(outputId = "National_Map"),
+  textOutput(outputId = "Help")
     )
   )
 
@@ -206,13 +207,10 @@ server <- function(input, output) {
 })
 
   #Exploratory Data Analysis 
-#  output$Exploratory_Data_Analysis <- renderTable({
-#    dataset <- Dataset()
-#    summary(dataset)
-#  })
-#  output$view <- renderTable({
-#    head(Dataset(), n = 10)
-# })
+  output$Exploratory_Data_Analysis <- renderTable({
+    dataset <- Dataset()
+    head(dataset,n=10)
+  })
   
   #Basic Plots
   output$Basic_Plots<- renderPlot(function(Dataset, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
@@ -280,8 +278,7 @@ server <- function(input, output) {
   #Epi Tools
   output$Epi_Tools <-renderTable(
     epi.2by2(Dataset, method = "cohort.count", conf.level = 0.95, units = 100, 
-             homogeneity = "breslow.day", outcome = "as.columns")
-  )
+             homogeneity = "breslow.day", outcome = "as.columns"))
   
   # National Map
   output$National_Map<- renderPlot(function(Dataset,existing_cases,population,state,year) {
@@ -292,7 +289,7 @@ server <- function(input, output) {
       #left_join(state_abbs, by = c("state" = "abb")) %>%
      right_join(us_map, by = c("state_full" = "region")) %>%
       ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
-      geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
+      geom_polygon(color = "white") + ggtitle("National Prevalence") +
       theme_void() + 
       scale_fill_viridis(name = "Prevalence")
    })
