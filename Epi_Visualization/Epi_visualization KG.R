@@ -111,9 +111,9 @@ mainPanel(
               textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
         tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
               textInput("text_box", label = "Interpretation", value = "Enter text...")),
-        tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
+        tabPanel("Epi Tools", tableOutput("EpiTools"),
               textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-        tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
+        tabPanel("National Map",  plotOutput("National Map", height = "580px"),
              textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
         tabPanel("Help",  htmlOutput("inc"))
     ),
@@ -122,7 +122,7 @@ mainPanel(
   tableOutput(outputId = "Epi_Tools"),
   plotOutput(outputId = "National_Map"),
   textOutput(outputId = "Help")
-    )
+)
   )
 
 server <- function(input, output) {
@@ -222,7 +222,7 @@ server <- function(input, output) {
         labs(title="title", x="xlab", y="ylab")
       #table1 = table(data$x)  ## get the cross tab
       #pic<-barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
-      return(pic)
+     return(pic)
       #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
     } else if(graph=="bargroup"){                                           
       pic<-ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
@@ -266,7 +266,7 @@ server <- function(input, output) {
         labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
       return(pic)
     } else if(graph=="linreg"){                                             
-      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
+    pic<-ggplot(Dataset, aes(x, y, color = fill)) +
         geom_point(shape = 16, size = 5, show.legend = TRUE) +
         theme_minimal() +
         scale_color_gradient(low = "light blue", high = "dark blue")+
