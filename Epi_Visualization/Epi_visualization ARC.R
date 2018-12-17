@@ -8,7 +8,29 @@
 #
 
 library(shiny)
+library(MASS)
+library(epiR)
+library(epitools)
+library(incidence)
 library(AER)
+library(epiDisplay)
+library(devtools)
+library(roxygen2)
+library(epicalc)
+library(maps)
+library(usmap)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(rprev)
+library(ggmap)
+library(mapdata)
+library(viridis)
+library(shinythemes)
+library(leaflet)
+library(httr)
+
+
 
 
 #Making Cleaned dataset into a CSV file
@@ -16,31 +38,16 @@ library(AER)
 
 #test_dataset_fatalities <- read.csv("Fatalities_clean.csv", stringsAsFactors = FALSE)
 
-ui <- pageWithSidebar(
-  
+ui <- fluidPage(
+  theme = shinytheme("superhero"), 
   # App title: Epi Visualization
   headerPanel("Epi Visualization"),
   
   # Sidebar panel for inputs ----
   sidebarPanel(
-    helpText("Create demographic maps and plot with 
-             information from the US Traffic Fatalities Panel Data"),
-    # Input: Selector for variable to plot against mpg ----
-    selectInput("variable", 
-                label = "Choose a variable to display",
-                choices = c("Fatalities" = "Fatal",
-                            "State" = "state_full",
-                            "Income" = "income",
-                            "Year" = "year")),
-    
-    sliderInput(inputId = "year",
-                label = "Years:",
-                min = 1982,
-                max = 1988,
-                value = 1),
-    
-    # Input: Checkbox for whether outliers should be included ----
-    checkboxInput("outliers", "Show outliers", TRUE),
+    helpText("Create demographic maps and plot with information dataset 
+             of choice or from the test dataset: The US Traffic Fatalities 
+             Panel Dataset"),
     
     fileInput("file", "Upload csv data-file:"),
     
@@ -85,32 +92,54 @@ ui <- pageWithSidebar(
   
   # Main panel for displaying outputs ----
   mainPanel(
-    h4("This app provides tools to help visualize epidemiologic data"),
-    h5("The mapping functions allow users to visualize the prevalence of their variable of interest at the national and regional levels. 
-       The graph functions allow users to plot and visualize their data in many ways?? Mention features."), 
+    h5("Welcome to Epi Visualization! This app provides tools to help visualize 
+       epidemiologic data. The graph functions allow users to plot and visualize 
+       their data in many ways. The mapping functions allow users to visualize the 
+       prevalence of their variable of interest at the national level."), 
     tags$head(
-         tags$style(type='text/css', 
-                    ".nav-tabs {font-size: 14px} ")), 
+      tags$style(type='text/css', 
+                 ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Scatterplots", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
+                tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
                          textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Boxplots", plotOutput("BoxPlot", height = "580px"),
+                tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
                          textInput("text_box", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Summary statistics", br(),verbatimTextOutput("lmResults"),
+                tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
                          textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Diagnostic plots",  plotOutput("diagnostics", height = "580px"),
+                tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Added variable plots",  plotOutput("added", height = "580px"),
-                         textInput("text_added", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Marginal model plots",  plotOutput("MMPlot", height = "580px"),
-                         textInput("text_mmp", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Help",  htmlOutput("inc"))
-                )
+    ),
+    tableOutput(outputId = "Exploratory_Data_Analysis"),
+    plotOutput(outputId = "Basic_Plots"),
+    tableOutput(outputId = "Epi_Tools"),
+    plotOutput(outputId = "National_Map")
     )
-  )
-library(shiny)
-library(ggplot2)
+)
+
+
+###setup the server and loaded data
+
+
+#Load sample dataset available in the AER package
 library(AER)
+data(Fatalities)
+
+us_map <- map_data("state")
+
+tbl <- state.x77 %>%
+  as_tibble(rownames = "state") %>%
+  bind_cols(state_name = str_to_lower(state.abb)) %>%
+  rename(value_x = Income) %>%
+  select(state_name, value_x)
+
+state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
+tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
+  rename(id = state_full)
+
+Fatalities_clean <- Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb"))
+
 server <- function(input, output) {
   ArgNames <- reactive({
     Names <- names(formals("read.csv")[-1])
