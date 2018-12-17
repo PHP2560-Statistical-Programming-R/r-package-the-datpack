@@ -268,8 +268,8 @@ server <- (function(input, output) {
     }
   })
   
-
-  output$Scatter <- renderPlot({
+#code to create a scatter plot
+  output$Scatter <- renderPlot({      
     if (is.null(input$xvar)) return(NULL)
     else if (length(input$xvar)==1){
       plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
@@ -279,7 +279,7 @@ server <- (function(input, output) {
     }
   })
 
-
+#code to create a scatter plot with a correlating line
   output$Scatterline <- renderPlot({
     if (is.null(input$xvar)) return(NULL)
     else if (length(input$xvar)==1){
@@ -290,7 +290,27 @@ server <- (function(input, output) {
     }
   })
   
+output$Histogram<-renderPlot({
+  if (is.null(input$xvar)) return(NULL)
+  else if (length(input$xvar)==1){
+    plot(table(input$xvar), data=Dataset(),type = "h", col = "blue", lwd = 10,  main = input$title)
+  }
+  else if (length(input$xvar)>1){
+    pairs(as.formula(paste(input$xvar)),data=Dataset())
+  }
+})
+  
+output$Barplot<-renderPlot({
+  pic1<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
+  paste(pic1)
+})
 
+output$Boxplot<-renderPlot({
+  #pi2<-boxplot(input$yvar~input$xvar, data=Dataset(), notch=TRUE,main=input$title, xlab=input$xlab, ylab=Input$ylab)
+  pic2<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + 
+    geom_boxplot(notch=TRUE)
+  return(pic2)
+})
 }
 )
 
@@ -319,3 +339,35 @@ shinyApp(ui, server)
 #pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
 #}
 #})
+
+
+# output$Histogram <- renderPlot({
+#  if (is.null(input$yvar)) return(NULL)
+# else if (length(input$xvar)>1){
+#  plot(as.formula(paste(input$yvar)),data=Dataset(),type="h",xlab=input$xlab,ylab=input$ylab,main=input$title)
+#plot_ly(as.formula(paste(y = input$xvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8)))
+#  }
+# else if (length(input$xvar)>1){
+#  pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+#}
+#})
+
+#output$Histogram <- renderPlot({
+#if (is.null(input$yvar)) return(NULL)
+#else if (length(input$xvar)>1){
+#     gg<-hist(data=Dataset(),input$xvar,col = "#75AADB", border = "white", xlab = input$xlab, main = input$title)
+#   #plot(as.formula(paste(input$yvar)),data=Dataset(),type="h",xlab=input$xlab,ylab=input$ylab,main=input$title)
+#plot_ly(as.formula(paste(y = input$xvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8)))
+#    return(gg)
+#}
+# else if (length(input$xvar)>1){
+#  pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+#  }
+# }) 
+
+#output$Histogram<-renderPlot({
+#bins <- seq(min(input$xvar), max(input$xvar))
+
+# hist(data=Dataset(),input$xvar,col = "#75AADB", border = "white", xlab = input$xlab, main = input$title)
+#  hist(input$xvar,xlab = input$xlab,col = "blue",border = "dark blue")
+# })
