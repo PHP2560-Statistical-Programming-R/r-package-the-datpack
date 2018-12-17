@@ -106,22 +106,22 @@ mainPanel(
     tags$head(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
-  tabsetPanel(type = "tabs", 
-        tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
-              textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-        tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
-              textInput("text_box", label = "Interpretation", value = "Enter text...")),
-        tabPanel("Epi Tools", tableOutput("EpiTools"),
-              textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-        tabPanel("National Map",  plotOutput("National Map", height = "580px"),
-             textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
-        tabPanel("Help",  htmlOutput("inc"))
+    tabsetPanel(type = "tabs", 
+                tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
+                         textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
+                tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
+                         textInput("text_box", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
+                         textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
+                tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Help",  htmlOutput("inc"))
     ),
-  tableOutput(outputId = "Exploratory_Data_Analysis"),
-  plotOutput(outputId = "Basic_Plots"),
-  tableOutput(outputId = "Epi_Tools"),
-  plotOutput(outputId = "National_Map"),
-  textOutput(outputId = "Help")
+    tableOutput(outputId = "Exploratory_Data_Analysis"),
+    plotOutput(outputId = "Basic_Plots"),
+    tableOutput(outputId = "Epi_Tools"),
+    plotOutput(outputId = "National_Map"),
+    textOutput(outputId = "Help")
 )
   )
 
@@ -212,6 +212,7 @@ server <- function(input, output) {
     head(dataset,n=10)
   })
   
+  
   #Basic Plots
   output$Basic_Plots<- renderPlot(function(Dataset, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
     Dataset[complete.cases(Dataset), ]
@@ -286,7 +287,6 @@ server <- function(input, output) {
     Dataset %>%
       group_by(!! sym(state), !! sym(year)) %>%
       mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
-      #left_join(state_abbs, by = c("state" = "abb")) %>%
      right_join(us_map, by = c("state_full" = "region")) %>%
       ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
       geom_polygon(color = "white") + ggtitle("National Prevalence") +
