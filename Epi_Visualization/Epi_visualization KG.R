@@ -29,7 +29,7 @@ library(viridis)
 library(shinythemes)
 library(httr)
 library(plotly)
-library(stargazer)
+library(pastecs)
 
 
 #Making Cleaned dataset into a CSV file
@@ -263,12 +263,11 @@ server <- function(input, output) {
     dataset <- Dataset()
     head(dataset,n=10)
   })
-
+  
   #Summary Stats
   output$summary <- renderTable({
-    dataset<- Dataset()
-    head(dataset, n = 6,  
-    rownames = TRUE) 
+    dataset <- Dataset()
+    stat.desc(dataset, basic=F)
   })
   
   output$Barplot <- renderPlot({
