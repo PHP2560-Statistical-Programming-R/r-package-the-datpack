@@ -107,25 +107,31 @@ mainPanel(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Exploratory Data Analysis",
-                         tableOutput(outputId = "Exploratory_Data_Analysis"), 
-                         plotOutput("ScatterMatrix", width = "100%", height = "580px"),
-                         textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
-                         textInput("text_box", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
+                tabPanel("View the Data",
+                         tableOutput(outputId = "view"), 
+                tabPanel("Summary Statistics", 
+                         tableOutput(outputId = "summary")),
+                tabPanel("BarPlot", 
+                         plotOutput(outputId = "Barplot", height = "580px"),
+                         plotOutput(outputId = "Stacked", height = "580px"),
+                         plotOutput(outputId = "Grouped", height = "580px"),
                          textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
+                tabPanel("Boxplot",  
+                         plotOutput(outputId = "Boxplot", height = "580px"),
+                         plotOutput(outputId = "Dot", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Histogram",
+                         plotOutput(outputId = "Histogram", height = "580px"),
+                         plotOutput(outputId = "Density", height = "580px")),
+                tabPanel("Scatterplot",
+                         plotOutput(outputId = "Scatter", height = "580px"),
+                         plotOutput(outputId = "Scatter_line", height = "580px")),
+                tabPanel("Linear Regression",
+                         plotOutput(outputId = "Linear", height = "580px")),
                 tabPanel("Help",  htmlOutput("inc"))
-    ),
-    
-    plotOutput(outputId = "Basic_Plots"),
-    tableOutput(outputId = "Epi_Tools"),
-    plotOutput(outputId = "National_Map"),
-    textOutput(outputId = "Help")
+    )
+))
 )
-  )
 
 #action buttom instead of reactive
 
@@ -214,7 +220,7 @@ server <- function(input, output) {
 })
 
   #Exploratory Data Analysis 
-  output$Exploratory_Data_Analysis <- renderTable({
+  output$view <- renderTable({
     dataset <- Dataset()
     head(dataset,n=10)
   })
