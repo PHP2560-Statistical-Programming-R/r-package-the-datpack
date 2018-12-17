@@ -97,8 +97,9 @@ ui <-fluidPage(
     
     htmlOutput("datasetnameout"),
     
+  
     # Action Button
-    actionButton("go", "Generate Plots",style="color: #fff; background-color: #337ab7; 
+    actionButton("goButton", "Generate Plots",style="color: #fff; background-color: #337ab7; 
                  border-color: #2e6da4"),
     
     #Name on report
@@ -143,14 +144,9 @@ mainPanel(
                 tabPanel("Linear Regression",
                          plotOutput(outputId = "Linear", height = "580px")),
                 tabPanel("Help",  htmlOutput("inc"))
+                
     )
 ))
-
-
-#action buttom instead of reactive
-
-#View Data, Summary Stats, Barplot (stacked and grouped), Boxplot (box, dot box), Histogram (density plot), 
-#Scatterplot (scatter, scatter with line), linear regression 
 
 server <- function(input, output) {
   ArgNames <- reactive({
@@ -158,6 +154,7 @@ server <- function(input, output) {
     Names <- Names[Names!="..."]
     return(Names)
   })
+
   
   ### Data import:
   Dataset <- reactive({
@@ -279,47 +276,47 @@ server <- function(input, output) {
   })
   
   output$Barplot <- renderPlot({
-    ggplot(data=Dataset, aes(x=x, fill=x)) + 
+    ggplot(data=Dataset, aes(x=xvar, fill=xvar)) + 
       geom_bar( ) +
       scale_fill_brewer(palette = "Paired")+
       labs(title="title", x="xlab", y="ylab")
   })
   
   output$Stacked <- renderPlot({
-    ggplot(data=Dataset, aes(fill=fill, y=y, x=x)) +
+    ggplot(data=Dataset, aes(fill=fill, y=yvar, x=xvar)) +
       geom_bar( stat="identity")
   })
   
   output$Grouped <- renderPlot({
-    ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
+    ggplot(data=Dataset, aes(x=xvar, y=yvar, fill=fillvar)) +
       geom_bar(position="dodge", stat="identity") + 
       scale_fill_brewer(palette = "Paired")+ theme_bw()+ facet_wrap(~"fill")
   })
 
   output$Boxplot <- renderPlot({
-    boxplot(y~x, data=data, notch=TRUE,
+    boxplot(yvar~xvar, data=Dataset, notch=TRUE,
             main="title", xlab="xlab", ylab="ylab")
   })
   output$Dot <- renderPlot({
-    plot_ly(y = ~y, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+    plot_ly(yvar = ~yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
   })
   
   output$Histogram <- renderPlot({
-    ggplot(data=data, aes(x)) +                    
+    ggplot(data=Dataset, aes(xvar)) +                    
       geom_histogram(col="black", aes(fill=..count..)) +
       scale_fill_gradient("Count", low="light blue", high="navy")+
       labs(title="title", x="xlab", y="ylab")
   })
   
   output$Density <- renderPlot({
-    ggplot(data=data, aes(x)) + 
-      geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
+    ggplot(data=Dataset, aes(xvar)) + 
+      geom_histogram(aes(yvar =..density..),col="blue", fill="light blue", alpha=.5) + 
       geom_density(col=2) + 
       labs(title="title", x="xlab", y="ylab")
   })
   
   output$Scatter <- renderPlot({
-    ggplot(data, aes(x, y, color = fill)) +
+    ggplot(Dataset, aes(xvar, yvar, color = fill)) +
       geom_point(shape = 16, size = 5, show.legend = TRUE) +
       theme_minimal() +
       #scale_color_gradient(color = "Blues")+
@@ -327,14 +324,14 @@ server <- function(input, output) {
   })
   
   output$Scatter_line <- renderPlot({
-    ggplot(data, aes(x, y, color = fill)) +
+    ggplot(Dataset, aes(xvar, yvar, color = fill)) +
       geom_point(shape = 16, size = 5, show.legend = TRUE) +
       theme_minimal() +
       scale_color_gradient(low = "light blue", high = "dark blue")+
       labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
   })
    output$Linear <- renderPlot({
-     ggplot(data, aes(x, y, color = fill)) +
+     ggplot(Dataset, aes(xvar, yvar, color = fill)) +
        geom_point(shape = 16, size = 5, show.legend = TRUE) +
        theme_minimal() +
        scale_color_gradient(low = "light blue", high = "dark blue")+
