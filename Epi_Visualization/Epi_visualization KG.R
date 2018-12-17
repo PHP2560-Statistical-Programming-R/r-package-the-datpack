@@ -102,7 +102,7 @@ mainPanel(
     h5("Welcome to Epi Visualization! This app provides tools to help visualize 
        epidemiologic data. The graph functions allow users to plot and visualize 
        their data in many ways. The mapping functions allow users to visualize the 
-       prevalence of their variable of interest at the national and regional levels."), 
+       prevalence of their variable of interest at the national level."), 
     tags$head(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
@@ -198,7 +198,7 @@ server <- function(input, output) {
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     if (input$myLoader && is.null(input$file)){
-      textInput("datasetame", "Name of dataset", value = "birthwt")
+      textInput("datasetame", "Name of dataset", value = "")
     }
     else if (is.null(input$file)==FALSE){
       textInput("datasetame", "Name of dataset", value = "Enter text...")
@@ -216,7 +216,7 @@ server <- function(input, output) {
   
   #Basic Plots
   output$Basic_Plots<- renderPlot(function(Dataset, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
-    Dataset[complete.cases(data), ]
+    Dataset[complete.cases(Dataset), ]
     if(graph == "bar"){                           #boxplot function
       pic<-  ggplot(data=Dataset, aes(x=x, fill=x)) + 
         geom_bar( ) +
@@ -254,7 +254,7 @@ server <- function(input, output) {
         labs(title="title", x="xlab", y="ylab")
       return(pic)
     } else if(graph=="scatter"){                                            #GOOD
-      pic<-ggplot(data, aes(x, y, color = fill)) +
+      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
         geom_point(shape = 16, size = 5, show.legend = TRUE) +
         theme_minimal() +
         #scale_color_gradient(color = "Blues")+
