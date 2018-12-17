@@ -102,8 +102,6 @@ ui <- fluidPage(
     , width=3),
     
   
-  
-  # Main panel for displaying outputs ----
   mainPanel(
     h5("Welcome to Epi Visualization! This app provides tools to help visualize 
        epidemiologic data. The graph functions allow users to plot and visualize 
@@ -113,22 +111,30 @@ ui <- fluidPage(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Scatterplots", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
-                         textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Boxplots", plotOutput("BoxPlot", height = "580px"),
-                         textInput("text_box", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Summary statistics", br(),verbatimTextOutput("lmResults"),
+                tabPanel("View the Data",
+                         tableOutput(outputId = "view")), 
+                tabPanel("Summary Statistics", 
+                         tableOutput(outputId = "summary")),
+                tabPanel("BarPlot", 
+                         plotOutput(outputId = "Barplot", height = "580px"),
+                         plotOutput(outputId = "Stacked", height = "580px"),
+                         plotOutput(outputId = "Grouped", height = "580px"),
                          textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Diagnostic plots",  plotOutput("diagnostics", height = "580px"),
+                tabPanel("Boxplot",  
+                         plotOutput(outputId = "Boxplot", height = "580px"),
+                         plotOutput(outputId = "Dot", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Added variable plots",  plotOutput("added", height = "580px"),
-                         textInput("text_added", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Marginal model plots",  plotOutput("MMPlot", height = "580px"),
-                         textInput("text_mmp", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Histogram",
+                         plotOutput(outputId = "Histogram", height = "580px"),
+                         plotOutput(outputId = "Density", height = "580px")),
+                tabPanel("Scatterplot",
+                         plotOutput(outputId = "Scatter", height = "580px"),
+                         plotOutput(outputId = "Scatter_line", height = "580px")),
+                tabPanel("Linear Regression",
+                         plotOutput(outputId = "Linear", height = "580px")),
                 tabPanel("Help",  htmlOutput("inc"))
     )
-  )
-)
+    ))
 
 
 ###setup the server and loaded data
@@ -136,7 +142,6 @@ ui <- fluidPage(
 
 #Load sample dataset available in the AER package
 #clean data for loading
-library(AER)
 data(Fatalities)
 
 us_map <- map_data("state")
@@ -263,47 +268,18 @@ server <- (function(input, output) {
     }
   })
   
-  
-  
-  #Exploratory Data Analysis 
-  output$Exploratory_Data_Analysis <- renderTable({
-    dataset <- Dataset()
-    head(dataset,n=10)
-  }) 
-  
-  
-  ## Boxplot
-  output$BoxPlot <- renderPlot({
-   # boxplot(y~x, data=Dataset, notch=TRUE,
-            #main=title, xlab=xlab, ylab=ylab) 
-    boxplot(paste(input$outcome~input$varcat, data=Dataset(), 
-notch=TRUE, notch=TRUE,main=paste("Boxplot of",input$outcome,"versus",input$varcat)))
-  })
-  
-  output$ScatterMatrix <- renderPlot({
-    if (is.null(input$varnum)) return(NULL)
-    else if (length(input$varnum)==1){
-      plot(as.formula(paste(input$outcome,"~",input$varnum)),data=Dataset(),xlab=input$varnum,ylab=input$outcome,main=paste("Scatterplot for",input$outcome,"versus",input$varnum))
-    }
-    else if (length(input$varnum)>1){
-      pairs(as.formula(paste("~",paste(c(input$varnum,input$outcome),collapse="+"))),data=Dataset())
-    }
-  })
-   
+
+output$Scatter <- renderPlot({
+ if (is.null(input$xvar)) return(NULL)
+  else if (length(input$yvar)==1){
+   plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xvar,ylab=input$yvar,main=paste("Scatterplot for",input$yvar,"versus",input$xvar))
+  }
+  else if (length(input$varnum)>1){
+  pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
+  }
+})
 }
-
 )
-
-#output$ScatterMatrix <- renderPlot({
- # if (is.null(model())||is.null(input$varnum)) return(NULL)
-  #else if (length(input$varnum)==1){
-   # plot(as.formula(paste(input$outcome,"~",input$varnum)),data=Dataset(),xlab=input$varnum,ylab=input$outcome,main=paste("Scatterplot for",input$outcome,"versus",input$varnum))
-  #}
-  #else if (length(input$varnum)>1){
-  #  pairs(as.formula(paste("~",paste(c(input$varnum,input$outcome),collapse="+"))),data=Dataset())
-  #}
-#})
-
 
 shinyApp(ui, server)
 
