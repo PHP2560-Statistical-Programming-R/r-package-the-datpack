@@ -28,6 +28,7 @@ library(mapdata)
 library(viridis)
 library(shinythemes)
 library(httr)
+library(plotly)
 
 
 #Making Cleaned dataset into a CSV file
@@ -249,16 +250,56 @@ server <- function(input, output) {
       geom_bar( stat="identity")
   })
   
-  output$Grouped <-renderPlot({
+  output$Grouped <- renderPlot({
     ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
       geom_bar(position="dodge", stat="identity") + 
       scale_fill_brewer(palette = "Paired")+ theme_bw()+ facet_wrap(~"fill")
   })
 
-  output$Boxplot <-renderPlot({
+  output$Boxplot <- renderPlot({
     boxplot(y~x, data=data, notch=TRUE,
             main="title", xlab="xlab", ylab="ylab")
   })
+  output$Dot <- renderPlot({
+    plot_ly(y = ~y, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+  })
+  
+  output$Histogram <- renderPlot({
+    ggplot(data=data, aes(x)) +                    
+      geom_histogram(col="black", aes(fill=..count..)) +
+      scale_fill_gradient("Count", low="light blue", high="navy")+
+      labs(title="title", x="xlab", y="ylab")
+  })
+  
+  output$Density <- renderPlot({
+    ggplot(data=data, aes(x)) + 
+      geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
+      geom_density(col=2) + 
+      labs(title="title", x="xlab", y="ylab")
+  })
+  
+  output$Scatter <- renderPlot({
+    ggplot(data, aes(x, y, color = fill)) +
+      geom_point(shape = 16, size = 5, show.legend = TRUE) +
+      theme_minimal() +
+      #scale_color_gradient(color = "Blues")+
+      labs(title="title", x="xlab", y="ylab", color = "legend")
+  })
+  
+  output$Scatter_line <- renderPlot({
+    ggplot(data, aes(x, y, color = fill)) +
+      geom_point(shape = 16, size = 5, show.legend = TRUE) +
+      theme_minimal() +
+      scale_color_gradient(low = "light blue", high = "dark blue")+
+      labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
+  })
+   output$Linear <- renderPlot({
+     ggplot(data, aes(x, y, color = fill)) +
+       geom_point(shape = 16, size = 5, show.legend = TRUE) +
+       theme_minimal() +
+       scale_color_gradient(low = "light blue", high = "dark blue")+
+       labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
+   })
 }
 
 shinyApp(ui, server)
