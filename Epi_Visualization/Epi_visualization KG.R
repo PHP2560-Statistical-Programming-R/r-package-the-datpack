@@ -107,7 +107,9 @@ mainPanel(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
+                tabPanel("Exploratory Data Analysis",
+                         tableOutput(outputId = "Exploratory_Data_Analysis"), 
+                         plotOutput("ScatterMatrix", width = "100%", height = "580px"),
                          textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
                 tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
                          textInput("text_box", label = "Interpretation", value = "Enter text...")),
@@ -117,13 +119,15 @@ mainPanel(
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Help",  htmlOutput("inc"))
     ),
-    tableOutput(outputId = "Exploratory_Data_Analysis"),
+    
     plotOutput(outputId = "Basic_Plots"),
     tableOutput(outputId = "Epi_Tools"),
     plotOutput(outputId = "National_Map"),
     textOutput(outputId = "Help")
 )
   )
+
+#action buttom instead of reactive
 
 server <- function(input, output) {
   ArgNames <- reactive({
