@@ -119,7 +119,7 @@ mainPanel(
     ),
   tableOutput(outputId = "Exploratory_Data_Analysis"),
   plotOutput(outputId = "Basic_Plots"),
-  plotOutput(outputId = "Epi_Tools"),
+  tableOutput(outputId = "Epi_Tools"),
   plotOutput(outputId = "National_Map")
     )
   )
@@ -278,6 +278,11 @@ server <- function(input, output) {
   })
   
   #Epi Tools
+  output$Epi_Tools <-renderTable(
+    epi.2by2(Dataset, method = "cohort.count", conf.level = 0.95, units = 100, 
+             homogeneity = "breslow.day", outcome = "as.columns")
+  )
+  
   # National Map
   output$National_Map<- renderPlot(function(Dataset,existing_cases,population,state,year) {
     us_map <- map_data("state")
