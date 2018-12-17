@@ -129,6 +129,9 @@ mainPanel(
 
 #action buttom instead of reactive
 
+#View Data, Summary Stats, Barplot (stacked and grouped), Boxplot (box, dot box), Histogram (density plot), 
+#Scatterplot (scatter, scatter with line), linear regression 
+
 server <- function(input, output) {
   ArgNames <- reactive({
     Names <- names(formals("read.csv")[-1])
@@ -285,18 +288,7 @@ server <- function(input, output) {
     epi.2by2(Dataset, method = "cohort.count", conf.level = 0.95, units = 100, 
              homogeneity = "breslow.day", outcome = "as.columns"))
   
-  # National Map
-  output$National_Map<- renderPlot(function(Dataset,existing_cases,population,state,year) {
-    us_map <- map_data("state")
-    Dataset %>%
-      group_by(!! sym(state), !! sym(year)) %>%
-      mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
-     right_join(us_map, by = c("state_full" = "region")) %>%
-      ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
-      geom_polygon(color = "white") + ggtitle("National Prevalence") +
-      theme_void() + 
-      scale_fill_viridis(name = "Prevalence")
-   })
+
 }
 
 shinyApp(ui, server)
