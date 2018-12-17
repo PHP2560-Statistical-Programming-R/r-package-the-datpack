@@ -129,7 +129,7 @@ ui <- fluidPage(
                          plotOutput(outputId = "Density", height = "580px")),
                 tabPanel("Scatterplot",
                          plotOutput(outputId = "Scatter", height = "580px"),
-                         plotOutput(outputId = "Scatter_line", height = "580px")),
+                         plotOutput(outputId = "Scatterline", height = "580px")),
                 tabPanel("Linear Regression",
                          plotOutput(outputId = "Linear", height = "580px")),
                 tabPanel("Help",  htmlOutput("inc"))
@@ -269,21 +269,37 @@ server <- (function(input, output) {
   })
   
 
-output$Scatter <- renderPlot({
- if (is.null(input$xvar)) return(NULL)
-  else if (length(input$yvar)==1){
-   plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
-  }
-  else if (length(input$varnum)>1){
-  pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
-  }
-})
+  output$Scatter <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$xvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$xvar)>1){
+      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+    }
+  })
+
+
+  output$Scatterline <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$xvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),type="b",xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$xvar)>1){
+      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+    }
+  })
+  
+
 }
 )
 
 shinyApp(ui, server)
 
 
+#scatter plot: (data=data, x=data$x, y=data$y, graph="scatter",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
+#scatter plot with correlating line: (data=data, x=data$x, y=data$y, graph="scatterline",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
+#linear regression: (data=data, x=data$x, y=data$y, graph="linreg",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
 
 
 
@@ -291,4 +307,15 @@ shinyApp(ui, server)
 #server <- function(input, output) {}
 #shinyApp(ui = ui, server = server)
 
-
+#output$Scatterline <- renderPlot({
+#if (is.null(input$xvar)) return(NULL)
+#else if (length(input$xvar)==1){
+#pic<-(ggplot(data=Dataset(), aes(input$xvar, input$yvar)) +  
+#                      geom_point() +
+#                     labs(title="input$title", x="input$xlab", y="input$ylab")+geom_smooth())
+#paste(pic)
+#}
+#else if (length(input$xvar)>1){
+#pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
+#}
+#})
