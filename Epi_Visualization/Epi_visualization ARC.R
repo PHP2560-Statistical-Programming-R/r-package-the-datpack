@@ -272,7 +272,7 @@ server <- (function(input, output) {
 output$Scatter <- renderPlot({
  if (is.null(input$xvar)) return(NULL)
   else if (length(input$yvar)==1){
-   plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xvar,ylab=input$yvar,main=paste("Scatterplot for",input$yvar,"versus",input$xvar))
+   plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
   }
   else if (length(input$varnum)>1){
   pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
