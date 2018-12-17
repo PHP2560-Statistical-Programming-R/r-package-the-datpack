@@ -71,14 +71,23 @@ ui <-fluidPage(
     hr(),
     
     # Variable selection:
-    #Independent Numeric variable selection:
-    htmlOutput("varselect_num"),
+    #Variable selection for x:
+    htmlOutput("xvar"),
     
-    #Independent Categorical variable selection:
-    htmlOutput("varselect_cat"),
+    #Variable Selection for y:
+    htmlOutput("yvar"),
     
-    #Dependent variable selection:
-    htmlOutput("outcomeselect"),
+    #Fill variable selection:
+    htmlOutput("fillvar"),
+    
+    #Title for generated plot
+    htmlOutput("title"),
+    
+    #Label of x-axis
+    htmlOutput("xlab"),
+    
+    #Label of y-axis
+    htmlOutput("ylab"),
     
     #Because next part is the download file part, so we add a line to block between variable selection and 
     #file download
@@ -87,6 +96,10 @@ ui <-fluidPage(
     #Name of dataset
     
     htmlOutput("datasetnameout"),
+    
+    # Action Button
+    actionButton("go", "Generate Plots",style="color: #fff; background-color: #337ab7; 
+                 border-color: #2e6da4"),
     
     #Name on report
     textInput("name", "Author name", value = "Name"),
@@ -178,35 +191,62 @@ server <- function(input, output) {
   
   
   # Select variables part 1:
-  output$varselect_num <- renderUI({
+  output$xvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Independent Numeric Variable selection:    
-    selectInput("varnum", "Explantory Variables (Numeric):",
-                names(Dataset()), multiple =TRUE)
+    selectInput("xvar", "X Variable",
+                names(Dataset()), names(Dataset()))
   })
   
   # Select variables part 2:
-  output$varselect_cat <- renderUI({
+  output$yvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Independent Categorical Variable selection:    
-    selectInput("varcat", "Explantory Variables (Categorical):",
-                names(Dataset()), multiple =TRUE)
+    selectInput("yvar", "Y Variable",
+                names(Dataset()), names(Dataset()))
   })
   
   # Select variables part 3:
-  output$outcomeselect <- renderUI({
+  output$fillvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Dependent Variable selection:
-    selectInput("outcome","Outcome Variable:",
+    selectInput("fillvar","Fill Variable:",
                 names(Dataset()), names(Dataset()))
   })
   
+  #Title Name
+  output$title <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    #Input title name
+    textInput("title", "Title of Graph", value = "Enter text...")
+  })
+  
+  
+  #X-axis label
+  output$xlab <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    #Input label name
+    textInput("xlab", "Label of X-axis", value = "Enter text...")
+  })
+  
+  #Y-axis label
+  output$ylab <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    #Input label name
+    textInput("ylab", "Label of Y-axis", value = "Enter text...")
+  })
   # Dataset Name:
   output$datasetnameout <- renderUI({
     
