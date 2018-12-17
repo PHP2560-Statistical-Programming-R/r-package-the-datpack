@@ -27,6 +27,7 @@ library(ggmap)
 library(mapdata)
 library(viridis)
 library(shinythemes)
+library(leaflet)
 
 
 #Making Cleaned dataset into a CSV file
@@ -116,7 +117,7 @@ mainPanel(
              textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
         tabPanel("Help",  htmlOutput("inc"))
     ),
-  plotOutput(outputId = "Exploratory_Data_Analysis"),
+  tableOutput(outputId = "Exploratory_Data_Analysis"),
   plotOutput(outputId = "Basic_Plots"),
   plotOutput(outputId = "Epi_Tools"),
   plotOutput(outputId = "National_Map")
@@ -203,12 +204,21 @@ server <- function(input, output) {
       textInput("datasetame", "Name of dataset", value = "Enter text...")
     }
 })
+
   #Exploratory Data Analysis 
+#  output$Exploratory_Data_Analysis <- renderTable({
+#    dataset <- Dataset()
+#    summary(dataset)
+#  })
+#  output$view <- renderTable({
+#    head(Dataset(), n = 10)
+# })
+  
   #Basic Plots
-  output$Basic_Plots<- renderPlot(function(data, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
-    data[complete.cases(data), ]
+  output$Basic_Plots<- renderPlot(function(Dataset, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
+    Dataset[complete.cases(data), ]
     if(graph == "bar"){                           #boxplot function
-      pic<-  ggplot(data=data, aes(x=x, fill=x)) + 
+      pic<-  ggplot(data=Dataset, aes(x=x, fill=x)) + 
         geom_bar( ) +
         scale_fill_brewer(palette = "Paired")+
         labs(title="title", x="xlab", y="ylab")
@@ -217,28 +227,28 @@ server <- function(input, output) {
       return(pic)
       #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
     } else if(graph=="bargroup"){                                           #works, but has column for NAs....why???
-      pic<-ggplot(data=data, aes(x=x, y=y, fill=fill)) +
+      pic<-ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
         geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~"fill")
       return(pic)
     } else if(graph=="barstack"){                                           #works, but has column for NAs....why???
-      pic<-ggplot(data=data, aes(fill=fill, y=y, x=x)) +
+      pic<-ggplot(data=Dataset, aes(fill=fill, y=y, x=x)) +
         geom_bar( stat="identity")
       return(pic)
     } else if(graph=="boxplot"){                                            #GOOD                 
-      pic<-boxplot(y~x, data=data, notch=TRUE,
+      pic<-boxplot(y~x, data=Dataset, notch=TRUE,
                    main="title", xlab="xlab", ylab="ylab")
       return(pic)
     } else if(graph=="dotboxplot"){                                         #GOOD
       pic<-plot_ly(y = ~y, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
       return(pic)
     } else if(graph=="hist"){                                               #GOOD
-      pic<-ggplot(data=data, aes(x)) +                    
+      pic<-ggplot(data=Dataset, aes(x)) +                    
         geom_histogram(col="black", aes(fill=..count..)) +
         scale_fill_gradient("Count", low="light blue", high="navy")+
         labs(title="title", x="xlab", y="ylab")
       return(pic)
     } else if(graph=="densityhist"){                                          #GOOD                  
-      pic<-ggplot(data=data, aes(x)) + 
+      pic<-ggplot(data=Dataset, aes(x)) + 
         geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
         geom_density(col=2) + 
         labs(title="title", x="xlab", y="ylab")
@@ -251,14 +261,14 @@ server <- function(input, output) {
         labs(title="title", x="xlab", y="ylab", color = "legend")
       return(pic)
     } else if(graph=="scatterline"){                                        #GOOD
-      pic<-ggplot(data, aes(x, y, color = fill)) +
+      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
         geom_point(shape = 16, size = 5, show.legend = TRUE) +
         theme_minimal() +
         scale_color_gradient(low = "light blue", high = "dark blue")+
         labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
       return(pic)
     } else if(graph=="linreg"){                                             #GOOD
-      pic<-ggplot(data, aes(x, y, color = fill)) +
+      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
         geom_point(shape = 16, size = 5, show.legend = TRUE) +
         theme_minimal() +
         scale_color_gradient(low = "light blue", high = "dark blue")+
@@ -269,18 +279,18 @@ server <- function(input, output) {
   
   #Epi Tools
   # National Map
-  output$National_Map<- renderPlot(function(data,existing_cases,population,state,year) {
+  output$National_Map<- renderPlot(function(Dataset,existing_cases,population,state,year) {
     us_map <- map_data("state")
-    data %>%
+    Dataset %>%
       group_by(!! sym(state), !! sym(year)) %>%
       mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
       #left_join(state_abbs, by = c("state" = "abb")) %>%
-      right_join(us_map, by = c("state_full" = "region")) %>%
+     right_join(us_map, by = c("state_full" = "region")) %>%
       ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
       geom_polygon(color = "white") + ggtitle("National Prevalence of Car Fatalities 1982-1988") +
       theme_void() + 
       scale_fill_viridis(name = "Prevalence")
-    })
+   })
 }
 
 shinyApp(ui, server)
