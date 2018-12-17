@@ -108,7 +108,7 @@ mainPanel(
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
                 tabPanel("View the Data",
-                         tableOutput(outputId = "view"), 
+                         tableOutput(outputId = "view")), 
                 tabPanel("Summary Statistics", 
                          tableOutput(outputId = "summary")),
                 tabPanel("BarPlot", 
@@ -131,7 +131,7 @@ mainPanel(
                 tabPanel("Help",  htmlOutput("inc"))
     )
 ))
-)
+
 
 #action buttom instead of reactive
 
@@ -224,83 +224,25 @@ server <- function(input, output) {
     dataset <- Dataset()
     head(dataset,n=10)
   })
-  
-  
-  #Basic Plots
-  output$Basic_Plots<- renderPlot(function(Dataset, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
-    Dataset[complete.cases(Dataset), ]
-    if(graph == "bar"){                           #boxplot function
-      pic<-  ggplot(data=Dataset, aes(x=x, fill=x)) + 
-        geom_bar( ) +
-        scale_fill_brewer(palette = "Paired")+
-        labs(title="title", x="xlab", y="ylab")
-      #table1 = table(data$x)  ## get the cross tab
-      #pic<-barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
-     return(pic)
-      #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
-    } else if(graph=="bargroup"){                                           
-      pic<-ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
-        geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~"fill")
-      return(pic)
-    } else if(graph=="barstack"){                                           
-      pic<-ggplot(data=Dataset, aes(fill=fill, y=y, x=x)) +
-        geom_bar( stat="identity")
-      return(pic)
-    } else if(graph=="boxplot"){                                                             
-      pic<-boxplot(y~x, data=Dataset, notch=TRUE,
-                   main="title", xlab="xlab", ylab="ylab")
-      return(pic)
-    } else if(graph=="dotboxplot"){                                         
-      pic<-plot_ly(y = ~y, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-      return(pic)
-    } else if(graph=="hist"){                                               
-      pic<-ggplot(data=Dataset, aes(x)) +                    
-        geom_histogram(col="black", aes(fill=..count..)) +
-        scale_fill_gradient("Count", low="light blue", high="navy")+
-        labs(title="title", x="xlab", y="ylab")
-      return(pic)
-    } else if(graph=="densityhist"){                                                           
-      pic<-ggplot(data=Dataset, aes(x)) + 
-        geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
-        geom_density(col=2) + 
-        labs(title="title", x="xlab", y="ylab")
-      return(pic)
-    } else if(graph=="scatter"){                                           
-      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
-        geom_point(shape = 16, size = 5, show.legend = TRUE) +
-        theme_minimal() +
-        #scale_color_gradient(color = "Blues")+
-        labs(title="title", x="xlab", y="ylab", color = "legend")
-      return(pic)
-    } else if(graph=="scatterline"){                                      
-      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
-        geom_point(shape = 16, size = 5, show.legend = TRUE) +
-        theme_minimal() +
-        scale_color_gradient(low = "light blue", high = "dark blue")+
-        labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
-      return(pic)
-    } else if(graph=="linreg"){                                             
-    pic<-ggplot(Dataset, aes(x, y, color = fill)) +
-        geom_point(shape = 16, size = 5, show.legend = TRUE) +
-        theme_minimal() +
-        scale_color_gradient(low = "light blue", high = "dark blue")+
-        labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
-      return(pic)
-    } 
+
+  #Summary Stats
+  output$summary <- renderTable({
+    tmp <- do.call(Dataset, 
+                   list(mean = apply(Dataset, 2, mean),
+                        sd = apply(Dataset, 2, sd),
+                        median = apply(Dataset, 2, median),
+                        min = apply(Dataset, 2, min),
+                        max = apply(Dataset, 2, max),
+                        n = apply(Dataset, 2, length)))
+    tmp
   })
-  
-  #Epi Tools
-  output$Epi_Tools <-renderTable(
-    epi.2by2(Dataset, method = "cohort.count", conf.level = 0.95, units = 100, 
-             homogeneity = "breslow.day", outcome = "as.columns"))
   
 
 }
 
 shinyApp(ui, server)
 
-#Things to Figure out:
-#  1. Upload dataset
-#  2. Getting Functions to work 
+#View Data, Summary Stats, Barplot (stacked and grouped), Boxplot (box, dot box), Histogram (density plot), 
+#Scatterplot (scatter, scatter with line), linear regression 
 
 
