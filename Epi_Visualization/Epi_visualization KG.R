@@ -29,6 +29,7 @@ library(viridis)
 library(shinythemes)
 library(httr)
 library(plotly)
+library(stargazer)
 
 
 #Making Cleaned dataset into a CSV file
@@ -266,13 +267,8 @@ server <- function(input, output) {
   #Summary Stats
   output$summary <- renderTable({
     dataset<- Dataset()
-    apply(dataset, 2, mean)
-    apply(dataset, 2, sd)
-    apply(dataset, 2, median)
-    apply(dataset, 2, min)
-    apply(dataset, 2, max)
-    apply(dataset, 2, length)
-    summary(dataset)
+    head(dataset, n = 6,  
+    rownames = TRUE) 
   })
   
   output$Barplot <- renderPlot({
@@ -316,11 +312,13 @@ server <- function(input, output) {
   })
   
   output$Scatter <- renderPlot({
-    ggplot(Dataset, aes(xvar, yvar, color = fill)) +
-      geom_point(shape = 16, size = 5, show.legend = TRUE) +
-      theme_minimal() +
-      #scale_color_gradient(color = "Blues")+
-      labs(title="title", x="xlab", y="ylab", color = "legend")
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$yvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$varnum)>1){
+      pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
+    }
   })
   
   output$Scatter_line <- renderPlot({
