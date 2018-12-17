@@ -227,17 +227,38 @@ server <- function(input, output) {
 
   #Summary Stats
   output$summary <- renderTable({
-    tmp <- do.call(Dataset, 
-                   list(mean = apply(Dataset, 2, mean),
-                        sd = apply(Dataset, 2, sd),
-                        median = apply(Dataset, 2, median),
-                        min = apply(Dataset, 2, min),
-                        max = apply(Dataset, 2, max),
-                        n = apply(Dataset, 2, length)))
-    tmp
+    dataset<- Dataset()
+    apply(dataset, 2, mean)
+    apply(dataset, 2, sd)
+    apply(dataset, 2, median)
+    apply(dataset, 2, min)
+    apply(dataset, 2, max)
+    apply(dataset, 2, length)
+    summary(dataset)
   })
   
+  output$Barplot <- renderPlot({
+    ggplot(data=Dataset, aes(x=x, fill=x)) + 
+      geom_bar( ) +
+      scale_fill_brewer(palette = "Paired")+
+      labs(title="title", x="xlab", y="ylab")
+  })
+  
+  output$Stacked <- renderPlot({
+    ggplot(data=Dataset, aes(fill=fill, y=y, x=x)) +
+      geom_bar( stat="identity")
+  })
+  
+  output$Grouped <-renderPlot({
+    ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
+      geom_bar(position="dodge", stat="identity") + 
+      scale_fill_brewer(palette = "Paired")+ theme_bw()+ facet_wrap(~"fill")
+  })
 
+  output$Boxplot <-renderPlot({
+    boxplot(y~x, data=data, notch=TRUE,
+            main="title", xlab="xlab", ylab="ylab")
+  })
 }
 
 shinyApp(ui, server)
