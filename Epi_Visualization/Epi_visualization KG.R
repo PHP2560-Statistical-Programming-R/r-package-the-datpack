@@ -226,48 +226,48 @@ server <- function(input, output) {
       #pic<-barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
       return(pic)
       #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
-    } else if(graph=="bargroup"){                                           #works, but has column for NAs....why???
+    } else if(graph=="bargroup"){                                           
       pic<-ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
         geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~"fill")
       return(pic)
-    } else if(graph=="barstack"){                                           #works, but has column for NAs....why???
+    } else if(graph=="barstack"){                                           
       pic<-ggplot(data=Dataset, aes(fill=fill, y=y, x=x)) +
         geom_bar( stat="identity")
       return(pic)
-    } else if(graph=="boxplot"){                                            #GOOD                 
+    } else if(graph=="boxplot"){                                                             
       pic<-boxplot(y~x, data=Dataset, notch=TRUE,
                    main="title", xlab="xlab", ylab="ylab")
       return(pic)
-    } else if(graph=="dotboxplot"){                                         #GOOD
+    } else if(graph=="dotboxplot"){                                         
       pic<-plot_ly(y = ~y, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
       return(pic)
-    } else if(graph=="hist"){                                               #GOOD
+    } else if(graph=="hist"){                                               
       pic<-ggplot(data=Dataset, aes(x)) +                    
         geom_histogram(col="black", aes(fill=..count..)) +
         scale_fill_gradient("Count", low="light blue", high="navy")+
         labs(title="title", x="xlab", y="ylab")
       return(pic)
-    } else if(graph=="densityhist"){                                          #GOOD                  
+    } else if(graph=="densityhist"){                                                           
       pic<-ggplot(data=Dataset, aes(x)) + 
         geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
         geom_density(col=2) + 
         labs(title="title", x="xlab", y="ylab")
       return(pic)
-    } else if(graph=="scatter"){                                            #GOOD
+    } else if(graph=="scatter"){                                           
       pic<-ggplot(Dataset, aes(x, y, color = fill)) +
         geom_point(shape = 16, size = 5, show.legend = TRUE) +
         theme_minimal() +
         #scale_color_gradient(color = "Blues")+
         labs(title="title", x="xlab", y="ylab", color = "legend")
       return(pic)
-    } else if(graph=="scatterline"){                                        #GOOD
+    } else if(graph=="scatterline"){                                      
       pic<-ggplot(Dataset, aes(x, y, color = fill)) +
         geom_point(shape = 16, size = 5, show.legend = TRUE) +
         theme_minimal() +
         scale_color_gradient(low = "light blue", high = "dark blue")+
         labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
       return(pic)
-    } else if(graph=="linreg"){                                             #GOOD
+    } else if(graph=="linreg"){                                             
       pic<-ggplot(Dataset, aes(x, y, color = fill)) +
         geom_point(shape = 16, size = 5, show.legend = TRUE) +
         theme_minimal() +
@@ -302,8 +302,6 @@ shinyApp(ui, server)
 
 #Things to Figure out:
 #  1. Upload dataset
-#  2. Output regional map (should we do one for each? or have a way to 
-      #select the region of interest)
-
+#  2. Getting Functions to work 
 
 
