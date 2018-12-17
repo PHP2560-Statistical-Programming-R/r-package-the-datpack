@@ -60,11 +60,11 @@ ui <- fluidPage(
     hr(),
     
     # Variable selection:
-    #Independent Numeric variable selection:
-    htmlOutput("varselect_num"),
+    #Variable selection for x:
+    htmlOutput("xvar"),
     
-    #Independent Categorical variable selection:
-    htmlOutput("varselect_cat"),
+    #Variable Selection for y:
+    htmlOutput("yvar"),
     
     #Dependent variable selection:
     htmlOutput("outcomeselect"),
@@ -100,21 +100,21 @@ ui <- fluidPage(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Exploratory Data Analysis", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
+                tabPanel("Scatterplots", plotOutput("ScatterMatrix", width = "100%", height = "580px"),
                          textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
+                tabPanel("Boxplots", plotOutput("BoxPlot", height = "580px"),
                          textInput("text_box", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
+                tabPanel("Summary statistics", br(),verbatimTextOutput("lmResults"),
                          textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
+                tabPanel("Diagnostic plots",  plotOutput("diagnostics", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Added variable plots",  plotOutput("added", height = "580px"),
+                         textInput("text_added", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Marginal model plots",  plotOutput("MMPlot", height = "580px"),
+                         textInput("text_mmp", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Help",  htmlOutput("inc"))
-    ),
-    tableOutput(outputId = "Exploratory_Data_Analysis"),
-    plotOutput(outputId = "Basic_Plots"),
-    tableOutput(outputId = "Epi_Tools"),
-    plotOutput(outputId = "National_Map")
     )
+  )
 )
 
 
@@ -122,6 +122,7 @@ ui <- fluidPage(
 
 
 #Load sample dataset available in the AER package
+#clean data for loading
 library(AER)
 data(Fatalities)
 
@@ -140,7 +141,7 @@ tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
 Fatalities_clean <- Fatalities %>%
   left_join(state_abbs, by = c("state" = "abb"))
 
-server <- function(input, output) {
+server <- (function(input, output) {
   ArgNames <- reactive({
     Names <- names(formals("read.csv")[-1])
     Names <- Names[Names!="..."]
@@ -179,23 +180,23 @@ server <- function(input, output) {
   
   
   # Select variables part 1:
-  output$varselect_num <- renderUI({
+  output$xvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Independent Numeric Variable selection:    
-    selectInput("varnum", "Explantory Variables (Numeric):",
-                names(Dataset()), multiple =TRUE)
+    selectInput("xvar", "X Variable",
+                names(Dataset()), names(Dataset()))
   })
   
   # Select variables part 2:
-  output$varselect_cat <- renderUI({
+  output$yvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Independent Categorical Variable selection:    
-    selectInput("varcat", "Explantory Variables (Categorical):",
-                names(Dataset()), multiple =TRUE)
+    selectInput("yvar", "Y Variable",
+                names(Dataset()), names(Dataset()))
   })
   
   # Select variables part 3:
@@ -214,7 +215,7 @@ server <- function(input, output) {
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     if (input$myLoader && is.null(input$file)){
-      textInput("datasetame", "Name of dataset", value = "birthwt")
+      textInput("datasetame", "Name of dataset", value = "")
     }
     else if (is.null(input$file)==FALSE){
       textInput("datasetame", "Name of dataset", value = "Enter text...")
@@ -222,7 +223,45 @@ server <- function(input, output) {
   })
   
   
+  
+  #Exploratory Data Analysis 
+  output$Exploratory_Data_Analysis <- renderTable({
+    dataset <- Dataset()
+    head(dataset,n=10)
+  }) 
+  
+  
+  ## Boxplot
+  output$BoxPlot <- renderPlot({
+   # boxplot(y~x, data=Dataset, notch=TRUE,
+            #main=title, xlab=xlab, ylab=ylab) 
+    boxplot(paste(input$outcome~input$varcat, data=Dataset(), 
+notch=TRUE, notch=TRUE,main=paste("Boxplot of",input$outcome,"versus",input$varcat)))
+  })
+  
+  output$ScatterMatrix <- renderPlot({
+    if (is.null(input$varnum)) return(NULL)
+    else if (length(input$varnum)==1){
+      plot(as.formula(paste(input$outcome,"~",input$varnum)),data=Dataset(),xlab=input$varnum,ylab=input$outcome,main=paste("Scatterplot for",input$outcome,"versus",input$varnum))
+    }
+    else if (length(input$varnum)>1){
+      pairs(as.formula(paste("~",paste(c(input$varnum,input$outcome),collapse="+"))),data=Dataset())
+    }
+  })
+   
 }
+
+)
+
+#output$ScatterMatrix <- renderPlot({
+ # if (is.null(model())||is.null(input$varnum)) return(NULL)
+  #else if (length(input$varnum)==1){
+   # plot(as.formula(paste(input$outcome,"~",input$varnum)),data=Dataset(),xlab=input$varnum,ylab=input$outcome,main=paste("Scatterplot for",input$outcome,"versus",input$varnum))
+  #}
+  #else if (length(input$varnum)>1){
+  #  pairs(as.formula(paste("~",paste(c(input$varnum,input$outcome),collapse="+"))),data=Dataset())
+  #}
+#})
 
 
 shinyApp(ui, server)
