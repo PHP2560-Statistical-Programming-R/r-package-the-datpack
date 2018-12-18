@@ -89,7 +89,7 @@ ui <-fluidPage(
     textInput("name", "Author name", value = "Name"),
     
     #Radio buttons for choosing format
-    radioButtons('format', "Document format", c('PDF', 'HTML', 'Word'), inline = TRUE),
+    radioButtons('format', "Document format", 'HTML', inline = TRUE),
     
     #Download button
     downloadButton('downloadReport')
@@ -98,9 +98,8 @@ ui <-fluidPage(
   # Main panel for displaying outputs ----
 mainPanel(
     h5("Welcome to Epi Visualization! This app provides tools to help visualize 
-       epidemiologic data. The graph functions allow users to plot and visualize 
-       their data in many ways. The mapping functions allow users to visualize the 
-       prevalence of their variable of interest at the national level."), 
+       epidemiologic data. The tabs allow users to exlore and visualize their dataset 
+       by using summary statistics and various plotting tools."), 
     tags$head(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
@@ -136,7 +135,7 @@ mainPanel(
                                            the variables you choose, some of the plots may not appear or look abnormal if the parameters
                                            of the variables are not met (ie. x and y must be continuous for scatterplots) . Choose to use the 
                                            pre-loaded Fatalities data or choose to upload your own data in csv format. Download the plots 
-                                           generated from this shiny app as a pdf, html, or word document. Enjoy!"),
+                                           generated from this shiny app as an html document. Enjoy!"),
                                     tags$h3("View the Data:"), "This tab displays the first 10 observations of all variables in your dataset.
                                               Use this tab to explore the data and assess type of variables that you are interested 
                                               in looking at in subsequent tabs.",
