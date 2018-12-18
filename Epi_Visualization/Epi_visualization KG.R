@@ -132,9 +132,12 @@ mainPanel(
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Help",  p(tags$h2("Guide to Epi Visualization"), 
                                     tags$br(), 
-                                    tags$b("Follow these instructions to evaluate and visualize your data using our shiny app. 
-                                           Below are specific instructions for using each of the visualization tabs. Choose to use the pre-loaded Fatalities data or choose to upload your own data in csv format. 
-                                           Download the plots generated from this shiny app as a pdf, html, or word document. Enjoy!"),
+                                    tags$b("Below are specific instructions for using each of the visualization tabs. Note: based on
+                                           the variables you choose, some of the plots may not appear or look abnormal if the parameters
+                                           of the variables are not met (ie. x and y must be continuous for scatterplots) . Choose to use the 
+                                           pre-loaded Fatalities data or choose to upload your own data in csv format. Download the plots 
+                                           generated from this shiny app as a pdf, html, 
+                                           or word document. Enjoy!"),
                                     tags$h3("View the Data:"), "This tab displays the first 10 observations in your data.
                                               Use this tab to explore the data and assess type of variables that you are interested 
                                               in looking at in subsequent tabs.",
