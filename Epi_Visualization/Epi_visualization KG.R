@@ -142,7 +142,8 @@ mainPanel(
                                     tags$h3("Boxplot:"), "Select x and y variables. The x variable must be discete, the y variable must
                                                           be continuous.",
                                     tags$br(),
-                                    tags$h3("Histogram:"), "Select x and y variables. The variables must be continuous",
+                                    tags$h3("Histogram:"), "The histogram tab creates a histogram based on two variables of 
+                                            interest. Select x and y variables. The variables must be continuous.",
                                     tags$br(), 
                                     tags$h3("Linear Regression:"), "Select x and y variables. The variables must be continuous",
                                     tags$br(),
