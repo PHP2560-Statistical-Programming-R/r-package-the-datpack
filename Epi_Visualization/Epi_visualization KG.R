@@ -320,7 +320,7 @@ server <- function(input, output) {
   #Barplot
   output$Barplot<-renderPlot({
     ggplot(data=Dataset(), aes_string(x=input$xvar, y=input$yvar)) + 
-      geom_bar(stat="identity")+ scale_fill_brewer(palette = "Paired")+
+      geom_bar(stat="identity",fill="dark blue")+ scale_fill_brewer(palette = "Paired")+
       labs(title=input$title, x=input$xlab, y=input$ylab)
   })
   
