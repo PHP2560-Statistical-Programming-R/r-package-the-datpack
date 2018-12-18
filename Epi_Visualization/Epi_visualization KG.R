@@ -127,6 +127,10 @@ mainPanel(
                          tableOutput(outputId = "view")), 
                 tabPanel("Summary Statistics", 
                          tableOutput(outputId = "summary")),
+                tabPanel("Scatterplot",
+                         plotOutput(outputId = "Scatter", height = "580px")),
+                tabPanel("Scatter Line",
+                         plotOutput(outputId = "Scatter_line", height = "580px")),
                 tabPanel("BarPlot", 
                          plotOutput(outputId = "Barplot", height = "580px"),
                          plotOutput(outputId = "Stacked", height = "580px"),
@@ -139,9 +143,6 @@ mainPanel(
                 tabPanel("Histogram",
                          plotOutput(outputId = "Histogram", height = "580px"),
                          plotOutput(outputId = "Density", height = "580px")),
-                tabPanel("Scatterplot",
-                         plotOutput(outputId = "Scatter", height = "580px"),
-                         plotOutput(outputId = "Scatter_line", height = "580px")),
                 tabPanel("Linear Regression",
                          plotOutput(outputId = "Linear", height = "580px")),
                 tabPanel("Help",  htmlOutput("inc"))
@@ -270,6 +271,30 @@ server <- function(input, output) {
     stat.desc(dataset, basic=F)
   })
   
+  #Scatter Plot
+  output$Scatter <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$yvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$varnum)>1){
+      pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
+    }
+  })
+  
+  #Scatter Line
+  output$Scatterline <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$xvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),type="b",xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$xvar)>1){
+      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+    }
+  })
+  
+  
+  #Barplot
   output$Barplot <- renderPlot({
     ggplot(data=Dataset, aes(x=xvar, fill=xvar)) + 
       geom_bar( ) +
@@ -288,20 +313,24 @@ server <- function(input, output) {
       scale_fill_brewer(palette = "Paired")+ theme_bw()+ facet_wrap(~"fill")
   })
 
-  output$Boxplot <- renderPlot({
-    boxplot(yvar~xvar, data=Dataset, notch=TRUE,
-            main="title", xlab="xlab", ylab="ylab")
+  output$BoxPlot <- renderPlot({
+    #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+    ggplot(Dataset(),aes(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
+    
+    #if (is.null(input$xvar)) return(NULL)
+    #if (length(input$xvar)>1){
+    #  par(mfrow=c(1,1))
+    #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
   })
+  
   output$Dot <- renderPlot({
     plot_ly(yvar = ~yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
   })
   
   output$Histogram <- renderPlot({
-    ggplot(data=Dataset, aes(xvar)) +                    
-      geom_histogram(col="black", aes(fill=..count..)) +
-      scale_fill_gradient("Count", low="light blue", high="navy")+
-      labs(title="title", x="xlab", y="ylab")
-  })
+    dataset <- Dataset()
+    plot(input$xvar, input$yvar, data=dataset, type="h", lwd=4, lend=1)
+    })
   
   output$Density <- renderPlot({
     ggplot(data=Dataset, aes(xvar)) + 
@@ -310,6 +339,7 @@ server <- function(input, output) {
       labs(title="title", x="xlab", y="ylab")
   })
   
+  #Scatter Plot
   output$Scatter <- renderPlot({
     if (is.null(input$xvar)) return(NULL)
     else if (length(input$yvar)==1){
@@ -320,13 +350,18 @@ server <- function(input, output) {
     }
   })
   
-  output$Scatter_line <- renderPlot({
-    ggplot(Dataset, aes(xvar, yvar, color = fill)) +
-      geom_point(shape = 16, size = 5, show.legend = TRUE) +
-      theme_minimal() +
-      scale_color_gradient(low = "light blue", high = "dark blue")+
-      labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
+  #Scatter Line
+  output$Scatterline <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$xvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),type="b",xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$xvar)>1){
+      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+    }
   })
+  
+  
    output$Linear <- renderPlot({
      ggplot(Dataset, aes(xvar, yvar, color = fill)) +
        geom_point(shape = 16, size = 5, show.legend = TRUE) +
