@@ -32,23 +32,6 @@ library(plotly)
 library(pastecs)
 
 
-#Making Cleaned dataset into a CSV file
-exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=",",row.names=F)
-
-#Cleaning the Fatalities Dataset
-tbl <- state.x77 %>%
-  as_tibble(rownames = "state") %>%
-  bind_cols(state_name = str_to_lower(state.abb)) %>%
-  rename(value_x = Income) %>%
-  select(state_name, value_x)
-
-state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
-tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
-  rename(id = state_full)
-
-Fatalities_clean <- Fatalities %>%
-  left_join(state_abbs, by = c("state" = "abb"))
-
 #Building the App
 ui <-fluidPage(
   theme = shinytheme("superhero"),          
@@ -142,6 +125,22 @@ mainPanel(
     )
 ))
 
+#Data Cleaning
+tbl <- state.x77 %>%
+  as_tibble(rownames = "state") %>%
+  bind_cols(state_name = str_to_lower(state.abb)) %>%
+  rename(value_x = Income) %>%
+  select(state_name, value_x)
+
+state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
+tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
+  rename(id = state_full)
+
+Fatalities_clean <- Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb"))
+
+
+#Server
 server <- function(input, output) {
   ArgNames <- reactive({
     Names <- names(formals("read.csv")[-1])
@@ -265,16 +264,12 @@ server <- function(input, output) {
   
   #median, mean, se. mean, ci.mean.0.95, var, std.dev, coef.var
   
-  #Barplot  
-  # output$Barplot<-renderPlot({
-   #  pic1<-ggplot(data=Dataset(), aes_string(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
-   #  paste(pic1)
-  #  })  
- 
   #Boxplot
   output$Boxplot <- renderPlot({
+    #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
     ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+
-      geom_point(colour='red',height = 400,width = 600)
+      geom_boxplot(colour='blue',height = 400,width = 600)+
+      labs(title=input$title, x=input$xlab, y=input$ylab)
   })
   
   #Scatter Plot
@@ -299,24 +294,7 @@ server <- function(input, output) {
     }
   })
   
-  
-#Boxplot
- # output$BoxPlot <- renderPlot({
-   # plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
- #   ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
-    
-    #if (is.null(input$xvar)) return(NULL)
-    #if (length(input$xvar)>1){
-    #  par(mfrow=c(1,1))
-    #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
-#  })
-  
-#Barplot  
- # output$Barplot<-renderPlot({
- #   pic1<-ggplot(data=Dataset(), aes_string(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
- #   paste(pic1)
-#  })  
-  
+
 #Histogram   
   output$Histogram <- renderPlot({
     dataset <- Dataset()
