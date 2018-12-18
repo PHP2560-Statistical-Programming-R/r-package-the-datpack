@@ -290,27 +290,34 @@ server <- (function(input, output) {
     }
   })
   
-output$Histogram<-renderPlot({
-  if (is.null(input$xvar)) return(NULL)
-  else if (length(input$xvar)==1){
-    plot(table(input$xvar), data=Dataset(),type = "h", col = "blue", lwd = 10,  main = input$title)
-  }
-  else if (length(input$xvar)>1){
-    pairs(as.formula(paste(input$xvar)),data=Dataset())
-  }
-})
+
   
 output$Barplot<-renderPlot({
   pic1<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
   paste(pic1)
 })
 
-output$Boxplot<-renderPlot({
+output$Histogram<-renderPlot({
+  plot(input$xvar, input$yvar, data=Dataset(), type="h", lwd=4, lend=1)
   #pi2<-boxplot(input$yvar~input$xvar, data=Dataset(), notch=TRUE,main=input$title, xlab=input$xlab, ylab=Input$ylab)
-  pic2<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + 
-    geom_boxplot(notch=TRUE)
-  return(pic2)
+ # pic2<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + 
+  #  geom_boxplot(notch=TRUE)
+  #return(pic2)
 })
+
+
+
+output$BoxPlot <- renderPlot({
+  #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+  ggplot(Dataset(),aes(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
+
+  #if (is.null(input$xvar)) return(NULL)
+  #if (length(input$xvar)>1){
+  #  par(mfrow=c(1,1))
+  #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
+})
+
+
 }
 )
 
