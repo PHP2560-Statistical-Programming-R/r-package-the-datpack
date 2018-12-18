@@ -17,6 +17,7 @@ library(tidyverse)
 library(shinythemes)
 library(httr)
 library(pastecs)
+library(rmarkdown)
 
 
 #test_dataset_fatalities <- read.csv("Fatalities_clean.csv", stringsAsFactors = FALSE)
@@ -74,7 +75,7 @@ ui <- fluidPage(
     textInput("name", "Author name", value = "Name"),
     
     #Radio buttons for choosing format
-    radioButtons('format', "Document format", c('PDF', 'HTML', 'Word'), inline = TRUE),
+    radioButtons('format', "Document format", c('HTML'), inline = TRUE),
     
     #Download button
     downloadButton('downloadReport')
@@ -350,8 +351,7 @@ server <- (function(input, output) {
       scale_color_gradient(low = "light blue", high = "dark blue")+
       labs(title=input$title, x=input$xlab, y=input$ylab, color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
   })
-  
-  
+
 }
 )
 
