@@ -9,28 +9,29 @@
 
 library(shiny)
 library(MASS)
-library(epiR)
-library(epitools)
-library(incidence)
 library(AER)
-library(epiDisplay)
 library(devtools)
-library(roxygen2)
-library(epicalc)
-library(maps)
-library(usmap)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
-library(rprev)
-library(ggmap)
-library(mapdata)
-library(viridis)
 library(shinythemes)
 library(httr)
 library(plotly)
 library(pastecs)
 
+#Test Dataset Cleaning
+tbl <- state.x77 %>%
+  as_tibble(rownames = "state") %>%
+  bind_cols(state_name = str_to_lower(state.abb)) %>%
+  rename(value_x = Income) %>%
+  select(state_name, value_x)
+
+state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
+tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
+  rename(id = state_full)
+
+Fatalities_clean <- Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb"))
 
 #Building the App
 ui <-fluidPage(
@@ -81,11 +82,6 @@ ui <-fluidPage(
     
     htmlOutput("datasetnameout"),
     
-  
-    # Action Button
-    actionButton("goButton", "Generate Plots",style="color: #fff; background-color: #337ab7; 
-                 border-color: #2e6da4"),
-    
     #Name on report
     textInput("name", "Author name", value = "Name"),
     
@@ -110,12 +106,12 @@ mainPanel(
                          tableOutput(outputId = "view")), 
                 tabPanel("Summary Statistics", 
                          tableOutput(outputId = "summary")), 
-                tabPanel("Boxplot",  
-                        plotOutput(outputId = "Boxplot", height = "580px")),
                 tabPanel("Scatterplot",
                          plotOutput(outputId = "Scatter", height = "580px")),
                 tabPanel("Scatter Line",
                          plotOutput(outputId = "Scatter_line", height = "580px")),
+                tabPanel("Boxplot",  
+                         plotOutput(outputId = "Boxplot", height = "580px")),
                 tabPanel("Histogram",
                          plotOutput(outputId = "Histogram", height = "580px")),
                 tabPanel("Linear Regression",
@@ -124,20 +120,6 @@ mainPanel(
                 
     )
 ))
-
-#Data Cleaning
-tbl <- state.x77 %>%
-  as_tibble(rownames = "state") %>%
-  bind_cols(state_name = str_to_lower(state.abb)) %>%
-  rename(value_x = Income) %>%
-  select(state_name, value_x)
-
-state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
-tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
-  rename(id = state_full)
-
-Fatalities_clean <- Fatalities %>%
-  left_join(state_abbs, by = c("state" = "abb"))
 
 
 #Server
@@ -259,18 +241,10 @@ server <- function(input, output) {
   #Summary Stats
   output$summary <- renderTable({
     dataset <- Dataset()
-    stat.desc(dataset, basic=F)
+    stat.desc(dataset, basic=F) 
   })
   
   #median, mean, se. mean, ci.mean.0.95, var, std.dev, coef.var
-  
-  #Boxplot
-  output$Boxplot <- renderPlot({
-    #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-    ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+
-      geom_boxplot(colour='blue',height = 400,width = 600)+
-      labs(title=input$title, x=input$xlab, y=input$ylab)
-  })
   
   #Scatter Plot
   output$Scatter <- renderPlot({
@@ -294,7 +268,14 @@ server <- function(input, output) {
     }
   })
   
-
+  #Boxplot
+  output$Boxplot <- renderPlot({
+    #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+    ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+
+      geom_boxplot(colour='blue',height = 400,width = 600)+
+      labs(title=input$title, x=input$xlab, y=input$ylab)
+  })
+  
 #Histogram   
   output$Histogram <- renderPlot({
     dataset <- Dataset()
