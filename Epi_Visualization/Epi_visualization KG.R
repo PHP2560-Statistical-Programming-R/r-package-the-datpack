@@ -129,23 +129,33 @@ mainPanel(
                                     tags$b("Follow these instructions to evaluate and visualize your data using our shiny app. 
                                            Below are specific instructions for using each of the visualization tabs. Choose to use the pre-loaded Fatalities data or choose to upload your own data in csv format. 
                                            Download the plots generated from this shiny app as a pdf, html, or word document. Enjoy!"),
-                                    tags$h3("View the Data:"), "This displays the first 10 observations in your data. Explore the data and assess type of variables that are in your data.",
+                                    tags$h3("View the Data:"), "This tab displays the first 10 observations in your data.
+                                              Use this tab to explore the data and assess type of variables that you are interested 
+                                              in looking at in subsequent tabs.",
                                     tags$br(), 
-                                    tags$h3("Summary Statistics:"), "Explore all variables of the dataset through summary statistics. 
+                                    tags$h3("Summary Statistics:"), "This tab allows users to explore all variables of the dataset through summary statistics. 
                                               The table displays median, mean, standard error of the mean, 95% confidence interval of 
                                               the mean.0.95, variance, standard deviation, and coefficient of variance in that order.",
                                     tags$br(), 
-                                    tags$h3("Scatterplot:"), "Select x and y variables. The variables must be continuous.",
+                                    tags$h3("Scatterplot:"), "The scatterplot tab creates a scatterplot based on two variables of 
+                                            interest. The graph will appear after selecting x and y variables. The variables must be 
+                                            continuous.",
                                     tags$br(), 
-                                    tags$h3("Scatter Line:"), "Select x and y variables. The variables must be continuous.",
+                                    tags$h3("Scatter Line:"), "The Scatter Line tab creates a scatterplot with a correlating trend line
+                                            based on two variables of interest. The graph will appear after selecting x and
+                                            y variables. The variables must be continuous.",
                                     tags$br(), 
-                                    tags$h3("Boxplot:"), "Select x and y variables. The x variable must be discete, the y variable must
-                                                          be continuous.",
+                                    tags$h3("Boxplot:"), "The Boxplot tab creates a boxplot based on two variables of 
+                                            interest. The graph will appear after selecting x and y variables. The x variable must be
+                                            discrete, the y variable must be continuous.",
                                     tags$br(),
                                     tags$h3("Histogram:"), "The histogram tab creates a histogram based on two variables of 
-                                            interest. Select x and y variables. The variables must be continuous.",
+                                            interest. The graph will appear after selecting x and y variables. The variables 
+                                            must be continuous.",
                                     tags$br(), 
-                                    tags$h3("Linear Regression:"), "Select x and y variables. The variables must be continuous",
+                                    tags$h3("Linear Regression:"), "The Linear Regression tab creates a linear regression 
+                                            line based on two variables of interest. The graph will appear after selecting 
+                                            x and y variables. The variables smust be continuous.",
                                     tags$br(),
                                     tags$h3("Additional links to guide you through Epi Visualization")
                 ))
