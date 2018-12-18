@@ -303,7 +303,7 @@ server <- function(input, output) {
     ggplot(data=dataset, aes_string(input$xvar)) + 
       geom_histogram(aes_string(input$yvar),col="blue", fill="light blue", alpha=.5) + 
       geom_density(col=2) + theme_classic() + 
-      labs(title="title", x="xlab", y="ylab")
+      labs(title=input$title, x=input$xlab, y=input$ylab)
   })
   
 #Linear Regression  
@@ -313,7 +313,7 @@ server <- function(input, output) {
        geom_point(shape = 16, size = 5, show.legend = TRUE) +
        theme_minimal() +
        scale_color_gradient(low = "light blue", high = "dark blue")+
-       labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
+       labs(title=input$title, x=input$xlab, y=input$ylab, color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
    })
 }
 
