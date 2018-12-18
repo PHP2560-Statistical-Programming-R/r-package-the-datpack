@@ -87,10 +87,6 @@ ui <- fluidPage(
     
     htmlOutput("datasetnameout"),
     
-    # Action Button
-    actionButton("go", "Generate Plots",style="color: #fff; background-color: #337ab7; 
-                 border-color: #2e6da4"),
-    
     #Name on report
     textInput("name", "Author name", value = "Name"),
     
@@ -116,16 +112,20 @@ ui <- fluidPage(
                 tabPanel("Summary Statistics", 
                          tableOutput(outputId = "summary")),
                 tabPanel("Scatterplot",
-                         plotOutput(outputId = "Scatter", height = "580px")),
+                         plotOutput(outputId = "Scatter", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Scatter Line",
-                         plotOutput(outputId = "Scatter_line", height = "580px")),
+                         plotOutput(outputId = "Scatter_line", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Boxplot",  
-                         plotOutput(outputId = "Boxplot", height = "580px")),
+                         plotOutput(outputId = "Boxplot", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Histogram",
                          plotOutput(outputId = "Histogram", height = "580px"),
-                         plotOutput(outputId = "Density", height = "580px")),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Linear Regression",
-                         plotOutput(outputId = "Linear", height = "580px")),
+                         plotOutput(outputId = "Linear", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Help",  htmlOutput("inc"))
     )
     ))
