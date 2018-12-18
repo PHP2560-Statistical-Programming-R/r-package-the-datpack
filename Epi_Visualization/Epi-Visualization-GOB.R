@@ -28,6 +28,8 @@ library(mapdata)
 library(viridis)
 library(shinythemes)
 library(httr)
+library(plotly)
+library(pastecs)
 
 
 #Making Cleaned dataset into a CSV file
@@ -76,29 +78,30 @@ ui <-fluidPage(
     #Variable Selection for y:
     htmlOutput("yvar"),
     
-    #Dependent variable selection:
-    htmlOutput("outcomeselect"),
+    #Fill variable selection:
+    htmlOutput("fillvar"),
+    
+    #Title for generated plot
+    htmlOutput("title"),
+    
+    #Label of x-axis
+    htmlOutput("xlab"),
+    
+    #Label of y-axis
+    htmlOutput("ylab"),
     
     #Because next part is the download file part, so we add a line to block between variable selection and 
     #file download
     
     hr(),
-    
     #Name of dataset
     
     htmlOutput("datasetnameout"),
+    
     
     # Action Button
-    actionButton("go", "Generate Plots",style="color: #fff; background-color: #337ab7; 
+    actionButton("goButton", "Generate Plots",style="color: #fff; background-color: #337ab7; 
                  border-color: #2e6da4"),
-    
-    #Because next part is the download file part, so we add a line to block between variable selection and 
-    #file download
-    
-    hr(),
-    #Name of dataset
-    
-    htmlOutput("datasetnameout"),
     
     #Name on report
     textInput("name", "Author name", value = "Name"),
@@ -120,27 +123,51 @@ ui <-fluidPage(
       tags$style(type='text/css', 
                  ".nav-tabs {font-size: 14px} ")), 
     tabsetPanel(type = "tabs", 
-                tabPanel("Exploratory Data Analysis",
-                         tableOutput(outputId = "Exploratory_Data_Analysis"), 
-                         plotOutput("ScatterMatrix", width = "100%", height = "580px"),
-                         textInput("text_scatt", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("Basic Plots", plotOutput("BoxPlot", height = "580px"),
-                         plotOutput(outputId = "Basic_Plots"),
-                         textInput("text_box", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Epi Tools", br(),verbatimTextOutput("lmResults"),
-                         textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
-                tabPanel("National Map",  plotOutput("diagnostics", height = "580px"),
+                tabPanel("View the Data",
+                         tableOutput(outputId = "view")), 
+                tabPanel("Summary Statistics", 
+                         tableOutput(outputId = "summary")),
+                tabPanel("Scatterplot",
+                         plotOutput(outputId = "Scatter", height = "580px")),
+                tabPanel("Scatter Line",
+                         plotOutput(outputId = "Scatter_line", height = "580px")),
+                tabPanel("BarPlot", 
+                         plotOutput(outputId = "Barplot", height = "580px"),
+                         plotOutput(outputId = "Stacked", height = "580px"),
+                         plotOutput(outputId = "Grouped", height = "580px"),
+                          textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
+                tabPanel("Boxplot",  
+                         plotOutput(outputId = "Boxplot", height = "580px"),
+                         plotOutput(outputId = "Dot", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Help",  htmlOutput("inc"))
-    ),
-    
-    
-    tableOutput(outputId = "Epi_Tools"),
-    plotOutput(outputId = "National_Map"),
-    textOutput(outputId = "Help")
+                tabPanel("Histogram",
+                         plotOutput(outputId = "Histogram", height = "580px"),
+                         plotOutput(outputId = "Density", height = "580px")),
+                tabPanel("Linear Regression",
+                         plotOutput(outputId = "Linear", height = "580px")),
+                tabPanel("Help",  p(tags$h2("Guide to Epi Visualization"), 
+                                    tags$br(), 
+                                    tags$b("Follow these instructions to evaluate and visualize your data using our shiny app. 
+                                           Below are specific instructions for using each of the visualization tabs."),
+                                    tags$h3("View the Data:"), "View data and explore the variables",
+                                    tags$br(), 
+                                    tags$h3("Summary Statistics:"), "Explore the data by selecting x and/or y variables to get summmary statistics of each",
+                                    tags$br(), 
+                                    tags$h3("Scatterplot:"), "Select x and y variables",
+                                    tags$br(), 
+                                    tags$h3("Barplot:"), "Select x and y variables",
+                                    tags$br(), 
+                                    tags$h3("Boxplot:"), "Select x and y variables",
+                                    tags$br(), 
+                                    tags$h3("Histogram:"), "Select x and y variables",
+                                    tags$br(), 
+                                    tags$h3("Linear Regression:"), "Select x and y variables",
+                                    tags$br(),
+                                    tags$h3("Additional links to guide you through Epi Visualization")
+                                    ))
+                
     )
-    )
-
+    ))
 
 server <- function(input, output) {
   ArgNames <- reactive({
@@ -148,6 +175,7 @@ server <- function(input, output) {
     Names <- Names[Names!="..."]
     return(Names)
   })
+  
   
   ### Data import:
   Dataset <- reactive({
@@ -181,35 +209,62 @@ server <- function(input, output) {
   
   
   # Select variables part 1:
-  output$varselect_num <- renderUI({
+  output$xvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Independent Numeric Variable selection:    
-    selectInput("varnum", "Explantory Variables (Numeric):",
-                names(Dataset()), multiple =TRUE)
+    selectInput("xvar", "X Variable",
+                names(Dataset()), names(Dataset()))
   })
   
   # Select variables part 2:
-  output$varselect_cat <- renderUI({
+  output$yvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Independent Categorical Variable selection:    
-    selectInput("varcat", "Explantory Variables (Categorical):",
-                names(Dataset()), multiple =TRUE)
+    selectInput("yvar", "Y Variable",
+                names(Dataset()), names(Dataset()))
   })
   
   # Select variables part 3:
-  output$outcomeselect <- renderUI({
+  output$fillvar <- renderUI({
     
     if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
     
     # Dependent Variable selection:
-    selectInput("outcome","Outcome Variable:",
+    selectInput("fillvar","Fill Variable:",
                 names(Dataset()), names(Dataset()))
   })
   
+  #Title Name
+  output$title <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    #Input title name
+    textInput("title", "Title of Graph", value = "Enter text...")
+  })
+  
+  
+  #X-axis label
+  output$xlab <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    #Input label name
+    textInput("xlab", "Label of X-axis", value = "Enter text...")
+  })
+  
+  #Y-axis label
+  output$ylab <- renderUI({
+    
+    if (identical(Dataset(), '') || identical(Dataset(),data.frame())) return(NULL)
+    
+    #Input label name
+    textInput("ylab", "Label of Y-axis", value = "Enter text...")
+  })
   # Dataset Name:
   output$datasetnameout <- renderUI({
     
@@ -224,92 +279,120 @@ server <- function(input, output) {
   })
   
   #Exploratory Data Analysis 
-  output$Exploratory_Data_Analysis <- renderTable({
+  output$view <- renderTable({
     dataset <- Dataset()
     head(dataset,n=10)
   })
   
-  
-  #Basic Plots
-  output$Basic_Plots<- renderPlot(function(Dataset, x, y, graph, fill, title, xlab, ylab, legend){    ###add argument for error bars
-    Dataset[complete.cases(Dataset), ]
-    if(graph == "bar"){                           #boxplot function
-      pic<-  ggplot(data=Dataset, aes(x=x, fill=x)) + 
-        geom_bar( ) +
-        scale_fill_brewer(palette = "Paired")+
-        labs(title="title", x="xlab", y="ylab")
-      #table1 = table(data$x)  ## get the cross tab
-      #pic<-barplot(table1, beside = TRUE, legend = levels(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")  
-      return(pic)
-      #barplot(table(data$x), col=c("lightblue","darkblue"),main="title", xlab="xlab", ylab = "ylab")
-    } else if(graph=="bargroup"){                                           
-      pic<-ggplot(data=Dataset, aes(x=x, y=y, fill=fill)) +
-        geom_bar(position="dodge", stat="identity") + scale_fill_brewer(palette = "Paired")+theme_bw()+facet_wrap(~"fill")
-      return(pic)
-    } else if(graph=="barstack"){                                           
-      pic<-ggplot(data=Dataset, aes(fill=fill, y=y, x=x)) +
-        geom_bar( stat="identity")
-      return(pic)
-    } else if(graph=="boxplot"){                                                             
-      pic<-boxplot(y~x, data=Dataset, notch=TRUE,
-                   main="title", xlab="xlab", ylab="ylab")
-      return(pic)
-    } else if(graph=="dotboxplot"){                                         
-      pic<-plot_ly(y = ~y, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-      return(pic)
-    } else if(graph=="hist"){                                               
-      pic<-ggplot(data=Dataset, aes(x)) +                    
-        geom_histogram(col="black", aes(fill=..count..)) +
-        scale_fill_gradient("Count", low="light blue", high="navy")+
-        labs(title="title", x="xlab", y="ylab")
-      return(pic)
-    } else if(graph=="densityhist"){                                                           
-      pic<-ggplot(data=Dataset, aes(x)) + 
-        geom_histogram(aes(y =..density..),col="blue", fill="light blue", alpha=.5) + 
-        geom_density(col=2) + 
-        labs(title="title", x="xlab", y="ylab")
-      return(pic)
-    } else if(graph=="scatter"){                                           
-      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
-        geom_point(shape = 16, size = 5, show.legend = TRUE) +
-        theme_minimal() +
-        #scale_color_gradient(color = "Blues")+
-        labs(title="title", x="xlab", y="ylab", color = "legend")
-      return(pic)
-    } else if(graph=="scatterline"){                                      
-      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
-        geom_point(shape = 16, size = 5, show.legend = TRUE) +
-        theme_minimal() +
-        scale_color_gradient(low = "light blue", high = "dark blue")+
-        labs(title="title", x="xlab", y="ylab", color = "legend")+geom_smooth()
-      return(pic)
-    } else if(graph=="linreg"){                                             
-      pic<-ggplot(Dataset, aes(x, y, color = fill)) +
-        geom_point(shape = 16, size = 5, show.legend = TRUE) +
-        theme_minimal() +
-        scale_color_gradient(low = "light blue", high = "dark blue")+
-        labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
-      return(pic)
-    } 
+  #Summary Stats
+  output$summary <- renderTable({
+    dataset <- Dataset()
+    stat.desc(dataset, basic=F)
   })
   
-  #Epi Tools
-  output$Epi_Tools <-renderTable(
-    epi.2by2(Dataset, method = "cohort.count", conf.level = 0.95, units = 100, 
-             homogeneity = "breslow.day", outcome = "as.columns"))
+  #Scatter Plot
+  output$Scatter <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$yvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$varnum)>1){
+      pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
+    }
+  })
   
-  # National Map
-  output$National_Map<- renderPlot(function(Dataset,existing_cases,population,state,year) {
-    us_map <- map_data("state")
-    Dataset %>%
-      group_by(!! sym(state), !! sym(year)) %>%
-      mutate(prevalence = !! sym(existing_cases) / !!sym(population)) %>%
-      right_join(us_map, by = c("state_full" = "region")) %>%
-      ggplot(aes(x = long, y = lat, group = group, fill = `prevalence`)) +
-      geom_polygon(color = "white") + ggtitle("National Prevalence") +
-      theme_void() + 
-      scale_fill_viridis(name = "Prevalence")
+  #Scatter Line
+  output$Scatter_line <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$xvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),type="b",xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$xvar)>1){
+      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+    }
+  })
+  
+  
+  #Barplot
+  output$Barplot <- renderPlot({
+    ggplot(data=Dataset, aes(x=xvar, fill=xvar)) + 
+      geom_bar( ) +
+      scale_fill_brewer(palette = "Paired")+
+      labs(title="title", x="xlab", y="ylab")
+  })
+  
+  output$Stacked <- renderPlot({
+    ggplot(data=Dataset, aes(fill=fill, y=yvar, x=xvar)) +
+      geom_bar( stat="identity")
+  })
+  
+  output$Grouped <- renderPlot({
+    ggplot(data=Dataset, aes(x=xvar, y=yvar, fill=fillvar)) +
+      geom_bar(position="dodge", stat="identity") + 
+      scale_fill_brewer(palette = "Paired")+ theme_bw()+ facet_wrap(~"fill")
+  })
+  
+  output$BoxPlot <- renderPlot({
+    #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+    ggplot(Dataset(),aes(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
+    
+    #if (is.null(input$xvar)) return(NULL)
+    #if (length(input$xvar)>1){
+    #  par(mfrow=c(1,1))
+    #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
+  })
+  
+  output$Dot <- renderPlot({
+    plot_ly(yvar = ~yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+  })
+  
+  output$Histogram <- renderPlot({
+    dataset <- Dataset()
+    plot(input$xvar, input$yvar, data=dataset, type="h", lwd=4, lend=1)
+  })
+  
+  output$Density <- renderPlot({
+    ggplot(data=Dataset, aes(xvar)) + 
+      geom_histogram(aes(yvar =..density..),col="blue", fill="light blue", alpha=.5) + 
+      geom_density(col=2) + 
+      labs(title="title", x="xlab", y="ylab")
+  })
+  
+  #Scatter Plot
+  output$Scatter <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$yvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$varnum)>1){
+      pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
+    }
+  })
+  
+  #Scatter Line
+  output$Scatterline <- renderPlot({
+    if (is.null(input$xvar)) return(NULL)
+    else if (length(input$xvar)==1){
+      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),type="b",xlab=input$xlab,ylab=input$ylab,main=input$title)
+    }
+    else if (length(input$xvar)>1){
+      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+    }
+  })
+  
+  
+  output$Linear <- renderPlot({
+    ggplot(Dataset, aes(xvar, yvar, color = fill)) +
+      geom_point(shape = 16, size = 5, show.legend = TRUE) +
+      theme_minimal() +
+      scale_color_gradient(low = "light blue", high = "dark blue")+
+      labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
   })
 }
 
 shinyApp(ui, server)
+
+
+
+
+
