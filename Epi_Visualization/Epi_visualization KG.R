@@ -136,9 +136,8 @@ mainPanel(
                                            the variables you choose, some of the plots may not appear or look abnormal if the parameters
                                            of the variables are not met (ie. x and y must be continuous for scatterplots) . Choose to use the 
                                            pre-loaded Fatalities data or choose to upload your own data in csv format. Download the plots 
-                                           generated from this shiny app as a pdf, html, 
-                                           or word document. Enjoy!"),
-                                    tags$h3("View the Data:"), "This tab displays the first 10 observations in your data.
+                                           generated from this shiny app as a pdf, html, or word document. Enjoy!"),
+                                    tags$h3("View the Data:"), "This tab displays the first 10 observations of all variables in your dataset.
                                               Use this tab to explore the data and assess type of variables that you are interested 
                                               in looking at in subsequent tabs.",
                                     tags$br(), 
@@ -166,7 +165,8 @@ mainPanel(
                                             line based on two variables of interest. The graph will appear after selecting 
                                             x and y variables. The variables smust be continuous.",
                                     tags$br(),
-                                    tags$h3("Additional links to guide you through Epi Visualization")
+                                    tags$h3("Additional link to guide you through Epi Visualization"),
+                                    tags$h5("Useful link for graphing: https://www.statmethods.net/graphs/index.html")
                 ))
            )
 ))
