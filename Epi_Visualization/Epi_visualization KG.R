@@ -19,6 +19,9 @@ library(httr)
 library(plotly)
 library(pastecs)
 
+#Making Cleaned dataset into a CSV file
+exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=",",row.names=F)
+
 #Test Dataset Cleaning
 tbl <- state.x77 %>%
   as_tibble(rownames = "state") %>%
@@ -105,20 +108,47 @@ mainPanel(
                 tabPanel("View the Data",
                          tableOutput(outputId = "view")), 
                 tabPanel("Summary Statistics", 
-                         tableOutput(outputId = "summary")), 
+                         tableOutput(outputId = "summary")),
                 tabPanel("Scatterplot",
-                         plotOutput(outputId = "Scatter", height = "580px")),
+                         plotOutput(outputId = "Scatter", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Scatter Line",
-                         plotOutput(outputId = "Scatter_line", height = "580px")),
+                         plotOutput(outputId = "Scatter_line", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Boxplot",  
-                         plotOutput(outputId = "Boxplot", height = "580px")),
+                         plotOutput(outputId = "Boxplot", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Histogram",
-                         plotOutput(outputId = "Histogram", height = "580px")),
+                         plotOutput(outputId = "Histogram", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Linear Regression",
-                         plotOutput(outputId = "Linear", height = "580px")),
-                tabPanel("Help",  htmlOutput("inc"))
-                
-    )
+                         plotOutput(outputId = "Linear", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Help",  p(tags$h2("Guide to Epi Visualization"), 
+                                    tags$br(), 
+                                    tags$b("Follow these instructions to evaluate and visualize your data using our shiny app. 
+                                           Below are specific instructions for using each of the visualization tabs. Choose to use the pre-loaded Fatalities data or choose to upload your own data in csv format. 
+                                           Download the plots generated from this shiny app as a pdf, html, or word document. Enjoy!"),
+                                    tags$h3("View the Data:"), "This displays the first 10 observations in your data. Explore the data and assess type of variables that are in your data.",
+                                    tags$br(), 
+                                    tags$h3("Summary Statistics:"), "Explore all variables of the dataset through summary statistics. 
+                                              The table displays median, mean, standard error of the mean, 95% confidence interval of 
+                                              the mean.0.95, variance, standard deviation, and coefficient of variance in that order.",
+                                    tags$br(), 
+                                    tags$h3("Scatterplot:"), "Select x and y variables. The variables must be continuous.",
+                                    tags$br(), 
+                                    tags$h3("Scatter Line:"), "Select x and y variables. The variables must be continuous.",
+                                    tags$br(), 
+                                    tags$h3("Boxplot:"), "Select x and y variables. The x variable must be discete, the y variable must
+                                                          be continuous.",
+                                    tags$br(),
+                                    tags$h3("Histogram:"), "Select x and y variables. The variables must be continuous",
+                                    tags$br(), 
+                                    tags$h3("Linear Regression:"), "Select x and y variables. The variables must be continuous",
+                                    tags$br(),
+                                    tags$h3("Additional links to guide you through Epi Visualization")
+                ))
+           )
 ))
 
 
