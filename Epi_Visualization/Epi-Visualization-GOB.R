@@ -149,9 +149,9 @@ ui <-fluidPage(
                                     tags$br(), 
                                     tags$b("Follow these instructions to evaluate and visualize your data using our shiny app. 
                                            Below are specific instructions for using each of the visualization tabs."),
-                                    tags$h3("View the Data:"), "View data and explore the variables",
+                                    tags$h3("View the Data:"), "This displays the first 10 observations in your data. Explore the data and assess type of variables that are in your data.",
                                     tags$br(), 
-                                    tags$h3("Summary Statistics:"), "Explore the data by selecting x and/or y variables to get summmary statistics of each",
+                                    tags$h3("Summary Statistics:"), "Explore the data by selecting a single variable to get summmary statistics of it or selecting two varibles to assess the two variables' associations.",
                                     tags$br(), 
                                     tags$h3("Scatterplot:"), "Select x and y variables",
                                     tags$br(), 
