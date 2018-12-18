@@ -131,11 +131,10 @@ mainPanel(
                          plotOutput(outputId = "Scatter", height = "580px")),
                 tabPanel("Scatter Line",
                          plotOutput(outputId = "Scatter_line", height = "580px")),
-                tabPanel("Boxplot",  
-                         plotOutput(outputId = "Boxplot", height = "580px")),
+                #tabPanel("Boxplot",  
+                      #   plotOutput(outputId = "Boxplot", height = "580px")),
                 tabPanel("Histogram",
-                         plotOutput(outputId = "Histogram", height = "580px"),
-                         plotOutput(outputId = "Density", height = "580px")),
+                         plotOutput(outputId = "Histogram", height = "580px")),
                 tabPanel("Linear Regression",
                          plotOutput(outputId = "Linear", height = "580px")),
                 tabPanel("Help",  htmlOutput("inc"))
@@ -289,8 +288,8 @@ server <- function(input, output) {
   
 #Boxplot
  # output$BoxPlot <- renderPlot({
-    #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-#    ggplot(Dataset(),aes(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
+   # plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+ #   ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
     
     #if (is.null(input$xvar)) return(NULL)
     #if (length(input$xvar)>1){
@@ -298,18 +297,12 @@ server <- function(input, output) {
     #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
 #  })
   
-#Histogram
+#Histogram   
   output$Histogram <- renderPlot({
     dataset <- Dataset()
-    plot(input$xvar, input$yvar, data=dataset, type="h", lwd=4, lend=1)
-    })
- 
-#Density Histogram   
-  output$Density <- renderPlot({
-    dataset <- Dataset()
     ggplot(data=dataset, aes_string(input$xvar)) + 
-      geom_histogram(aes_string(yvar =..density..),col="blue", fill="light blue", alpha=.5) + 
-      geom_density(col=2) + 
+      geom_histogram(aes_string(input$yvar),col="blue", fill="light blue", alpha=.5) + 
+      geom_density(col=2) + theme_classic() + 
       labs(title="title", x="xlab", y="ylab")
   })
   
