@@ -296,14 +296,12 @@ server <- (function(input, output) {
     }
   })
   
+  #Boxplot
   output$Boxplot <- renderPlot({
     #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-    ggplot(Dataset(),aes(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
-    
-    #if (is.null(input$xvar)) return(NULL)
-    #if (length(input$xvar)>1){
-    #  par(mfrow=c(1,1))
-    #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
+    ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+
+      geom_boxplot(colour='blue',height = 400,width = 600)+
+      labs(title=input$title, x=input$xlab, y=input$ylab)
   })
   
   #Histogram   
