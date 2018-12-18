@@ -16,7 +16,6 @@ library(AER)
 library(epiDisplay)
 library(devtools)
 library(roxygen2)
-library(epicalc)
 library(maps)
 library(usmap)
 library(ggplot2)
@@ -27,31 +26,20 @@ library(ggmap)
 library(mapdata)
 library(viridis)
 library(shinythemes)
+library(leaflet)
 library(httr)
-library(plotly)
 library(pastecs)
 
 
+
+
 #Making Cleaned dataset into a CSV file
-exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=",",row.names=F)
+#exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=",",row.names=F)
 
-#Cleaning the Fatalities Dataset
-tbl <- state.x77 %>%
-  as_tibble(rownames = "state") %>%
-  bind_cols(state_name = str_to_lower(state.abb)) %>%
-  rename(value_x = Income) %>%
-  select(state_name, value_x)
+#test_dataset_fatalities <- read.csv("Fatalities_clean.csv", stringsAsFactors = FALSE)
 
-state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
-tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
-  rename(id = state_full)
-
-Fatalities_clean <- Fatalities %>%
-  left_join(state_abbs, by = c("state" = "abb"))
-
-#Building the App
-ui <-fluidPage(
-  theme = shinytheme("superhero"),          
+ui <- fluidPage(
+  theme = shinytheme("superhero"), 
   # App title: Epi Visualization
   headerPanel("Epi Visualization"),
   
@@ -66,8 +54,8 @@ ui <-fluidPage(
     #Using action buttoms to load sample dataset
     #change the color of the buttom to contrast with previous blank
     actionButton("myLoader", "Load test dataset",  
-                 style="color: #fff; background-color: #337ab7; 
-                 border-color: #2e6da4"),
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+    
     #add block between each part
     hr(),
     
@@ -94,13 +82,13 @@ ui <-fluidPage(
     #file download
     
     hr(),
+    
     #Name of dataset
     
     htmlOutput("datasetnameout"),
     
-    
     # Action Button
-    actionButton("goButton", "Generate Plots",style="color: #fff; background-color: #337ab7; 
+    actionButton("go", "Generate Plots",style="color: #fff; background-color: #337ab7; 
                  border-color: #2e6da4"),
     
     #Name on report
@@ -113,7 +101,7 @@ ui <-fluidPage(
     downloadButton('downloadReport')
     , width=3),
   
-  # Main panel for displaying outputs ----
+  
   mainPanel(
     h5("Welcome to Epi Visualization! This app provides tools to help visualize 
        epidemiologic data. The graph functions allow users to plot and visualize 
@@ -131,51 +119,46 @@ ui <-fluidPage(
                          plotOutput(outputId = "Scatter", height = "580px")),
                 tabPanel("Scatter Line",
                          plotOutput(outputId = "Scatter_line", height = "580px")),
-                tabPanel("BarPlot", 
-                         plotOutput(outputId = "Barplot", height = "580px"),
-                         plotOutput(outputId = "Stacked", height = "580px"),
-                         plotOutput(outputId = "Grouped", height = "580px"),
-                          textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
                 tabPanel("Boxplot",  
-                         plotOutput(outputId = "Boxplot", height = "580px"),
-                         plotOutput(outputId = "Dot", height = "580px"),
-                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                         plotOutput(outputId = "Boxplot", height = "580px")),
                 tabPanel("Histogram",
                          plotOutput(outputId = "Histogram", height = "580px"),
                          plotOutput(outputId = "Density", height = "580px")),
                 tabPanel("Linear Regression",
                          plotOutput(outputId = "Linear", height = "580px")),
-                tabPanel("Help",  p(tags$h2("Guide to Epi Visualization"), 
-                                    tags$br(), 
-                                    tags$b("Follow these instructions to evaluate and visualize your data using our shiny app. 
-                                           Below are specific instructions for using each of the visualization tabs."),
-                                    tags$h3("View the Data:"), "View data and explore the variables",
-                                    tags$br(), 
-                                    tags$h3("Summary Statistics:"), "Explore the data by selecting x and/or y variables to get summmary statistics of each",
-                                    tags$br(), 
-                                    tags$h3("Scatterplot:"), "Select x and y variables",
-                                    tags$br(), 
-                                    tags$h3("Barplot:"), "Select x and y variables",
-                                    tags$br(), 
-                                    tags$h3("Boxplot:"), "Select x and y variables",
-                                    tags$br(), 
-                                    tags$h3("Histogram:"), "Select x and y variables",
-                                    tags$br(), 
-                                    tags$h3("Linear Regression:"), "Select x and y variables",
-                                    tags$br(),
-                                    tags$h3("Additional links to guide you through Epi Visualization")
-                                    ))
-                
+                tabPanel("Help",  htmlOutput("inc"))
     )
     ))
 
-server <- function(input, output) {
+
+###setup the server and loaded data
+
+
+#Load sample dataset available in the AER package
+#clean data for loading
+data(Fatalities)
+
+us_map <- map_data("state")
+
+tbl <- state.x77 %>%
+  as_tibble(rownames = "state") %>%
+  bind_cols(state_name = str_to_lower(state.abb)) %>%
+  rename(value_x = Income) %>%
+  select(state_name, value_x)
+
+state_abbs <- tibble(state_full = str_to_lower(state.name), abb = str_to_lower(state.abb))
+tbl_m <- left_join(tbl, state_abbs, by = c("state_name" = "abb")) %>%
+  rename(id = state_full)
+
+Fatalities_clean <- Fatalities %>%
+  left_join(state_abbs, by = c("state" = "abb"))
+
+server <- (function(input, output) {
   ArgNames <- reactive({
     Names <- names(formals("read.csv")[-1])
     Names <- Names[Names!="..."]
     return(Names)
   })
-  
   
   ### Data import:
   Dataset <- reactive({
@@ -265,6 +248,7 @@ server <- function(input, output) {
     #Input label name
     textInput("ylab", "Label of Y-axis", value = "Enter text...")
   })
+  
   # Dataset Name:
   output$datasetnameout <- renderUI({
     
@@ -312,87 +296,97 @@ server <- function(input, output) {
     }
   })
   
-  
-  #Barplot
-  output$Barplot <- renderPlot({
-    ggplot(data=Dataset, aes(x=xvar, fill=xvar)) + 
-      geom_bar( ) +
-      scale_fill_brewer(palette = "Paired")+
-      labs(title="title", x="xlab", y="ylab")
-  })
-  
-  output$Stacked <- renderPlot({
-    ggplot(data=Dataset, aes(fill=fill, y=yvar, x=xvar)) +
-      geom_bar( stat="identity")
-  })
-  
-  output$Grouped <- renderPlot({
-    ggplot(data=Dataset, aes(x=xvar, y=yvar, fill=fillvar)) +
-      geom_bar(position="dodge", stat="identity") + 
-      scale_fill_brewer(palette = "Paired")+ theme_bw()+ facet_wrap(~"fill")
-  })
-  
-  output$BoxPlot <- renderPlot({
+  #Boxplot
+  output$Boxplot <- renderPlot({
     #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-    ggplot(Dataset(),aes(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
-    
-    #if (is.null(input$xvar)) return(NULL)
-    #if (length(input$xvar)>1){
-    #  par(mfrow=c(1,1))
-    #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
+    ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+
+      geom_boxplot(colour='blue',height = 400,width = 600)+
+      labs(title=input$title, x=input$xlab, y=input$ylab)
   })
   
-  output$Dot <- renderPlot({
-    plot_ly(yvar = ~yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-  })
-  
+  #Histogram   
   output$Histogram <- renderPlot({
     dataset <- Dataset()
-    plot(input$xvar, input$yvar, data=dataset, type="h", lwd=4, lend=1)
+    ggplot(data=dataset, aes_string(input$xvar)) + 
+      geom_histogram(aes_string(input$yvar),col="blue", fill="light blue", alpha=.5) + 
+      geom_density(col=2) + theme_classic() + 
+      labs(title=input$title, x=input$xlab, y=input$ylab)
   })
   
-  output$Density <- renderPlot({
-    ggplot(data=Dataset, aes(xvar)) + 
-      geom_histogram(aes(yvar =..density..),col="blue", fill="light blue", alpha=.5) + 
-      geom_density(col=2) + 
-      labs(title="title", x="xlab", y="ylab")
-  })
-  
-  #Scatter Plot
-  output$Scatter <- renderPlot({
-    if (is.null(input$xvar)) return(NULL)
-    else if (length(input$yvar)==1){
-      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
-    }
-    else if (length(input$varnum)>1){
-      pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
-    }
-  })
-  
-  #Scatter Line
-  output$Scatterline <- renderPlot({
-    if (is.null(input$xvar)) return(NULL)
-    else if (length(input$xvar)==1){
-      plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),type="b",xlab=input$xlab,ylab=input$ylab,main=input$title)
-    }
-    else if (length(input$xvar)>1){
-      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
-    }
-  })
-  
-  
+  #Linear Regression  
   output$Linear <- renderPlot({
-    ggplot(Dataset, aes(xvar, yvar, color = fill)) +
+    dataset<- Dataset()
+    ggplot(dataset, aes_string(input$xvar, input$yvar, color = input$fillvar)) +
       geom_point(shape = 16, size = 5, show.legend = TRUE) +
       theme_minimal() +
       scale_color_gradient(low = "light blue", high = "dark blue")+
-      labs(title="title", x="xlab", y="ylab", color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
+      labs(title=input$title, x=input$xlab, y=input$ylab, color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
   })
+  
+  
 }
+)
 
 shinyApp(ui, server)
 
 
+#scatter plot: (data=data, x=data$x, y=data$y, graph="scatter",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
+#scatter plot with correlating line: (data=data, x=data$x, y=data$y, graph="scatterline",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
+#linear regression: (data=data, x=data$x, y=data$y, graph="linreg",fill=data$fill, title="Title of plot", xlab="x-axis label",  ylab="y-axis label", legend="Title of legend fill")
 
 
 
+#ui <- fluidPage() (basic structure of the app)
+#server <- function(input, output) {}
+#shinyApp(ui = ui, server = server)
+
+#output$Scatterline <- renderPlot({
+#if (is.null(input$xvar)) return(NULL)
+#else if (length(input$xvar)==1){
+#pic<-(ggplot(data=Dataset(), aes(input$xvar, input$yvar)) +  
+#                      geom_point() +
+#                     labs(title="input$title", x="input$xlab", y="input$ylab")+geom_smooth())
+#paste(pic)
+#}
+#else if (length(input$xvar)>1){
+#pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
+#}
+#})
+
+
+# output$Histogram <- renderPlot({
+#  if (is.null(input$yvar)) return(NULL)
+# else if (length(input$xvar)>1){
+#  plot(as.formula(paste(input$yvar)),data=Dataset(),type="h",xlab=input$xlab,ylab=input$ylab,main=input$title)
+#plot_ly(as.formula(paste(y = input$xvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8)))
+#  }
+# else if (length(input$xvar)>1){
+#  pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+#}
+#})
+
+#output$Histogram <- renderPlot({
+#if (is.null(input$yvar)) return(NULL)
+#else if (length(input$xvar)>1){
+#     gg<-hist(data=Dataset(),input$xvar,col = "#75AADB", border = "white", xlab = input$xlab, main = input$title)
+#   #plot(as.formula(paste(input$yvar)),data=Dataset(),type="h",xlab=input$xlab,ylab=input$ylab,main=input$title)
+#plot_ly(as.formula(paste(y = input$xvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8)))
+#    return(gg)
+#}
+# else if (length(input$xvar)>1){
+#  pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+#  }
+# }) 
+
+#output$Histogram<-renderPlot({
+#bins <- seq(min(input$xvar), max(input$xvar))
+
+# hist(data=Dataset(),input$xvar,col = "#75AADB", border = "white", xlab = input$xlab, main = input$title)
+#  hist(input$xvar,xlab = input$xlab,col = "blue",border = "dark blue")
+# })
+
+
+#output$Barplot<-renderPlot({
+#  pic1<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
+ # paste(pic1)
+#})
