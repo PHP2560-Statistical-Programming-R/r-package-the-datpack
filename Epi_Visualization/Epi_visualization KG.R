@@ -115,11 +115,17 @@ mainPanel(
                 tabPanel("Scatter Line",
                          plotOutput(outputId = "Scatter_line", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Barplot",
+                         plotOutput(outputId = "Barplot", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Boxplot",  
                          plotOutput(outputId = "Boxplot", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Histogram",
                          plotOutput(outputId = "Histogram", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Density Plot",
+                         plotOutput(outputId = "Density", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Linear Regression",
                          plotOutput(outputId = "Linear", height = "580px"),
@@ -309,6 +315,13 @@ server <- function(input, output) {
     }
   })
   
+  #Barplot
+  output$Barplot<-renderPlot({
+    ggplot(data=Dataset(), aes_string(x=input$xvar, y=input$yvar)) + 
+      geom_bar(stat="identity")+ scale_fill_brewer(palette = "Paired")+
+      labs(title=input$title, x=input$xlab, y=input$ylab)
+  })
+  
   #Boxplot
   output$Boxplot <- renderPlot({
     #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
@@ -323,6 +336,18 @@ server <- function(input, output) {
     ggplot(data=dataset, aes_string(input$xvar)) + 
       geom_histogram(aes_string(input$yvar),col="blue", fill="light blue", alpha=.5) + 
       geom_density(col=2) + theme_classic() + 
+      labs(title=input$title, x=input$xlab, y=input$ylab)
+  })
+  
+  #Density plot
+  output$Density<- renderPlot({
+    dataset <- Dataset()
+    ggplot(data=dataset, aes_string(input$xvar)) + 
+      geom_histogram(aes_string(y ="..density.."), 
+                     col="blue", 
+                     fill="light blue", 
+                     alpha=.5) + 
+      geom_density(col=2) + 
       labs(title=input$title, x=input$xlab, y=input$ylab)
   })
   
