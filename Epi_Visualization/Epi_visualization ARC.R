@@ -9,32 +9,15 @@
 
 library(shiny)
 library(MASS)
-library(epiR)
-library(epitools)
-library(incidence)
 library(AER)
-library(epiDisplay)
 library(devtools)
-library(roxygen2)
-library(epicalc)
-library(maps)
-library(usmap)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
-library(rprev)
-library(ggmap)
-library(mapdata)
-library(viridis)
 library(shinythemes)
-library(leaflet)
 library(httr)
+library(pastecs)
 
-
-
-
-#Making Cleaned dataset into a CSV file
-#exported_data<-write.table(Fatalities_clean, file="Fatalities_clean.csv",sep=",",row.names=F)
 
 #test_dataset_fatalities <- read.csv("Fatalities_clean.csv", stringsAsFactors = FALSE)
 
@@ -87,10 +70,6 @@ ui <- fluidPage(
     
     htmlOutput("datasetnameout"),
     
-    # Action Button
-    actionButton("go", "Generate Plots",style="color: #fff; background-color: #337ab7; 
-                 border-color: #2e6da4"),
-    
     #Name on report
     textInput("name", "Author name", value = "Name"),
     
@@ -100,7 +79,7 @@ ui <- fluidPage(
     #Download button
     downloadButton('downloadReport')
     , width=3),
-    
+  
   
   mainPanel(
     h5("Welcome to Epi Visualization! This app provides tools to help visualize 
@@ -115,23 +94,21 @@ ui <- fluidPage(
                          tableOutput(outputId = "view")), 
                 tabPanel("Summary Statistics", 
                          tableOutput(outputId = "summary")),
-                tabPanel("BarPlot", 
-                         plotOutput(outputId = "Barplot", height = "580px"),
-                         plotOutput(outputId = "Stacked", height = "580px"),
-                         plotOutput(outputId = "Grouped", height = "580px"),
-                         textInput("text_summary", label = "Interpretation", value = "Enter text...")), 
+                tabPanel("Scatterplot",
+                         plotOutput(outputId = "Scatter", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Scatter Line",
+                         plotOutput(outputId = "Scatter_line", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Boxplot",  
                          plotOutput(outputId = "Boxplot", height = "580px"),
-                         plotOutput(outputId = "Dot", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Histogram",
                          plotOutput(outputId = "Histogram", height = "580px"),
-                         plotOutput(outputId = "Density", height = "580px")),
-                tabPanel("Scatterplot",
-                         plotOutput(outputId = "Scatter", height = "580px"),
-                         plotOutput(outputId = "Scatterline", height = "580px")),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Linear Regression",
-                         plotOutput(outputId = "Linear", height = "580px")),
+                         plotOutput(outputId = "Linear", height = "580px"),
+                         textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Help",  htmlOutput("inc"))
     )
     ))
@@ -236,7 +213,7 @@ server <- (function(input, output) {
     textInput("title", "Title of Graph", value = "Enter text...")
   })
   
-
+  
   #X-axis label
   output$xlab <- renderUI({
     
@@ -268,19 +245,31 @@ server <- (function(input, output) {
     }
   })
   
-#code to create a scatter plot
-  output$Scatter <- renderPlot({      
+  #Exploratory Data Analysis 
+  output$view <- renderTable({
+    dataset <- Dataset()
+    head(dataset,n=10)
+  })
+  
+  #Summary Stats
+  output$summary <- renderTable({
+    dataset <- Dataset()
+    stat.desc(dataset, basic=F)
+  })
+  
+  #Scatter Plot
+  output$Scatter <- renderPlot({
     if (is.null(input$xvar)) return(NULL)
-    else if (length(input$xvar)==1){
+    else if (length(input$yvar)==1){
       plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),xlab=input$xlab,ylab=input$ylab,main=input$title)
     }
-    else if (length(input$xvar)>1){
-      pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
+    else if (length(input$varnum)>1){
+      pairs(as.formula(paste("~",paste(c(input$xvar,input$yvar),collapse="+"))),data=Dataset())
     }
   })
-
-#code to create a scatter plot with a correlating line
-  output$Scatterline <- renderPlot({
+  
+  #Scatter Line
+  output$Scatter_line <- renderPlot({
     if (is.null(input$xvar)) return(NULL)
     else if (length(input$xvar)==1){
       plot(as.formula(paste(input$yvar,"~",input$xvar)),data=Dataset(),type="b",xlab=input$xlab,ylab=input$ylab,main=input$title)
@@ -290,34 +279,34 @@ server <- (function(input, output) {
     }
   })
   
-
+  #Boxplot
+  output$Boxplot <- renderPlot({
+    #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
+    ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+
+      geom_boxplot(colour='blue',height = 400,width = 600)+
+      labs(title=input$title, x=input$xlab, y=input$ylab)
+  })
   
-output$Barplot<-renderPlot({
-  pic1<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
-  paste(pic1)
-})
-
-output$Histogram<-renderPlot({
-  plot(input$xvar, input$yvar, data=Dataset(), type="h", lwd=4, lend=1)
-  #pi2<-boxplot(input$yvar~input$xvar, data=Dataset(), notch=TRUE,main=input$title, xlab=input$xlab, ylab=Input$ylab)
- # pic2<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + 
-  #  geom_boxplot(notch=TRUE)
-  #return(pic2)
-})
-
-
-
-output$BoxPlot <- renderPlot({
-  #plot_ly(y = ~input$yvar, type = "box", boxpoints = "all", jitter = 0.3,pointpos = -1.8) 
-  ggplot(Dataset(),aes(x=input$xvar,y=input$yvar))+geom_point(colour='red',height = 400,width = 600)
-
-  #if (is.null(input$xvar)) return(NULL)
-  #if (length(input$xvar)>1){
-  #  par(mfrow=c(1,1))
-  #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
-})
-
-
+  #Histogram   
+  output$Histogram <- renderPlot({
+    dataset <- Dataset()
+    ggplot(data=dataset, aes_string(input$xvar)) + 
+      geom_histogram(aes_string(input$yvar),col="blue", fill="light blue", alpha=.5) + 
+      geom_density(col=2) + theme_classic() + 
+      labs(title=input$title, x=input$xlab, y=input$ylab)
+  })
+  
+  #Linear Regression  
+  output$Linear <- renderPlot({
+    dataset<- Dataset()
+    ggplot(dataset, aes_string(input$xvar, input$yvar, color = input$fillvar)) +
+      geom_point(shape = 16, size = 5, show.legend = TRUE) +
+      theme_minimal() +
+      scale_color_gradient(low = "light blue", high = "dark blue")+
+      labs(title=input$title, x=input$xlab, y=input$ylab, color = "legend")+ geom_smooth(method = 'lm', se = TRUE)
+  })
+  
+  
 }
 )
 
@@ -378,3 +367,9 @@ shinyApp(ui, server)
 # hist(data=Dataset(),input$xvar,col = "#75AADB", border = "white", xlab = input$xlab, main = input$title)
 #  hist(input$xvar,xlab = input$xlab,col = "blue",border = "dark blue")
 # })
+
+
+#output$Barplot<-renderPlot({
+#  pic1<-ggplot(data=Dataset(), aes(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
+# paste(pic1)
+#})
