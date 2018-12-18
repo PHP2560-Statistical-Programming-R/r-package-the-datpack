@@ -100,6 +100,9 @@ ui <- fluidPage(
                 tabPanel("Scatter Line",
                          plotOutput(outputId = "Scatter_line", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
+                tabPanel("Barplot",
+                        plotOutput(outputId = "Barplot", height = "580px"),
+                        textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
                 tabPanel("Boxplot",  
                          plotOutput(outputId = "Boxplot", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
@@ -109,7 +112,27 @@ ui <- fluidPage(
                 tabPanel("Linear Regression",
                          plotOutput(outputId = "Linear", height = "580px"),
                          textInput("text_diagno", label = "Interpretation", value = "Enter text...")),
-                tabPanel("Help",  htmlOutput("inc"))
+                tabPanel("Help",  p(tags$h2("Guide to Epi Visualization"), 
+                                    tags$br(), 
+                                    tags$b("Follow these instructions to evaluate and visualize your data using our shiny app. 
+                                           Below are specific instructions for using each of the visualization tabs. Choose to use the pre-loaded Fatalities data or choose to upload your own data in csv format. 
+                                           Download the plots generated from this shiny app as a pdf, html, or word document. Enjoy!"),
+                                    tags$h3("View the Data:"), "This displays the first 10 observations in your data. Explore the data and assess type of variables that are in your data.",
+                                    tags$br(), 
+                                    tags$h3("Summary Statistics:"), "Explore the data by selecting a single variable to get summmary statistics of it or selecting two varibles to assess the two variables' associations.",
+                                    tags$br(), 
+                                    tags$h3("Scatterplot:"), "Select x and y variables",
+                                    tags$br(), 
+                                    tags$h3("Scatter Line:"), "Select x and y variables",
+                                    tags$br(), 
+                                    tags$h3("Boxplot:"), "Select x and y variables",
+                                    tags$br(),
+                                    tags$h3("Histogram:"), "Select x and y variables",
+                                    tags$br(), 
+                                    tags$h3("Linear Regression:"), "Select x and y variables",
+                                    tags$br(),
+                                    tags$h3("Additional links to guide you through Epi Visualization")
+                ))
     )
     ))
 
@@ -277,6 +300,12 @@ server <- (function(input, output) {
     else if (length(input$xvar)>1){
       pairs(as.formula(paste("~",paste(c(input$yvar,input$xvar),collapse="+"))),data=Dataset())
     }
+  })
+  
+  
+  output$Barplot<-renderPlot({
+  ggplot(data=Dataset(), aes_string(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
+  # paste(pic1)
   })
   
   #Boxplot
