@@ -126,13 +126,13 @@ mainPanel(
                 tabPanel("View the Data",
                          tableOutput(outputId = "view")), 
                 tabPanel("Summary Statistics", 
-                         tableOutput(outputId = "summary")),
+                         tableOutput(outputId = "summary")), 
+                tabPanel("Boxplot",  
+                        plotOutput(outputId = "Boxplot", height = "580px")),
                 tabPanel("Scatterplot",
                          plotOutput(outputId = "Scatter", height = "580px")),
                 tabPanel("Scatter Line",
                          plotOutput(outputId = "Scatter_line", height = "580px")),
-                #tabPanel("Boxplot",  
-                      #   plotOutput(outputId = "Boxplot", height = "580px")),
                 tabPanel("Histogram",
                          plotOutput(outputId = "Histogram", height = "580px")),
                 tabPanel("Linear Regression",
@@ -263,6 +263,20 @@ server <- function(input, output) {
     stat.desc(dataset, basic=F)
   })
   
+  #median, mean, se. mean, ci.mean.0.95, var, std.dev, coef.var
+  
+  #Barplot  
+  # output$Barplot<-renderPlot({
+   #  pic1<-ggplot(data=Dataset(), aes_string(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
+   #  paste(pic1)
+  #  })  
+ 
+  #Boxplot
+  output$Boxplot <- renderPlot({
+    ggplot(Dataset(),aes_string(x=input$xvar,y=input$yvar))+
+      geom_point(colour='red',height = 400,width = 600)
+  })
+  
   #Scatter Plot
   output$Scatter <- renderPlot({
     if (is.null(input$xvar)) return(NULL)
@@ -296,6 +310,12 @@ server <- function(input, output) {
     #  par(mfrow=c(1,1))
     #  boxplot(paste(input$yvar,"~",input$xvar),xlab=input$xlab,ylab=input$ylab,data=Dataset(),main=input$title)
 #  })
+  
+#Barplot  
+ # output$Barplot<-renderPlot({
+ #   pic1<-ggplot(data=Dataset(), aes_string(x=input$xvar, y=input$yvar)) + geom_bar(stat="identity")
+ #   paste(pic1)
+#  })  
   
 #Histogram   
   output$Histogram <- renderPlot({
